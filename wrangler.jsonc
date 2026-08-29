@@ -1,0 +1,23 @@
+{
+  "$schema": "node_modules/wrangler/config-schema.json",
+  "name": "india-evisa-redesign",
+  "main": "worker/index.ts",
+  "compatibility_date": "2026-08-01",
+  "assets": {
+    "binding": "ASSETS",
+    "not_found_handling": "single-page-application",
+    "run_worker_first": true
+  },
+  "d1_databases": [
+    {
+      "binding": "DB",
+      "database_name": "india-evisa",
+      "database_id": "c49215b1-f1ae-4f22-a90d-6b4384a7171f",
+      "migrations_dir": "migrations"
+    }
+  ],
+  "r2_buckets": [
+    { "binding": "DOCUMENTS", "bucket_name": "india-evisa-documents" }
+  ],
+  "vars": { "ADMIN_DEMO_KEY": "evisa-review-demo" }
+}

@@ -14,7 +14,7 @@ export function VisaTypeDetail() {
   return (
     <PageFrame>
       <Breadcrumbs items={[{ label: 'Visa types', to: '/visa-types' }, { label: visa.name }]} />
-      <PageIntro eyebrow={visa.category} title={visa.name} intro={visa.description}>
+      <PageIntro title={visa.name} intro={visa.description}>
         <ButtonLink to={`/apply?visaType=${encodeURIComponent(visa.slug)}`} trailingIcon={<ArrowUpRight aria-hidden="true" size={17} strokeWidth={1.5} />}>Start this application</ButtonLink>
       </PageIntro>
 
@@ -23,12 +23,12 @@ export function VisaTypeDetail() {
           <section aria-labelledby="visa-overview-heading">
             <h2 className="display text-3xl" id="visa-overview-heading">At a glance</h2>
             <dl className="mt-6 grid border-y border-[var(--hairline)] sm:grid-cols-2">
-              <div className="border-b border-[var(--hairline)] py-5 sm:border-r sm:pr-7"><dt className="eyebrow text-[var(--stone)]">Common uses</dt><dd className="mt-2 text-[15px] leading-6 text-[var(--ink)]">{visa.commonUses}</dd></div>
-              <div className="border-b border-[var(--hairline)] py-5 sm:pl-7"><dt className="eyebrow text-[var(--stone)]">Validity</dt><dd className="mt-2 text-[15px] leading-6 text-[var(--ink)]">{visa.validity}</dd></div>
-              <div className="border-b border-[var(--hairline)] py-5 sm:border-r sm:pr-7"><dt className="eyebrow text-[var(--stone)]">Entries</dt><dd className="mt-2 text-[15px] leading-6 text-[var(--ink)]">{visa.entries}</dd></div>
-              <div className="border-b border-[var(--hairline)] py-5 sm:pl-7"><dt className="eyebrow text-[var(--stone)]">Typical processing</dt><dd className="mt-2 text-[15px] leading-6 text-[var(--ink)]">{visa.processing}</dd></div>
-              <div className="py-5 sm:border-r sm:pr-7"><dt className="eyebrow text-[var(--stone)]">Demonstration fee</dt><dd className="mt-2 text-[15px] leading-6 text-[var(--ink)] tabular-nums">From ${visa.feeUsd} USD</dd></div>
-              <div className="py-5 sm:pl-7"><dt className="eyebrow text-[var(--stone)]">Category</dt><dd className="mt-2 text-[15px] leading-6 text-[var(--ink)]">{visa.category}</dd></div>
+              <div className="min-w-0 border-b border-[var(--hairline)] py-5 sm:border-r sm:pr-7"><dt className="text-sm normal-case tracking-normal text-[var(--stone)]">Common uses</dt><dd className="mt-2 text-[15px] leading-6 text-[var(--ink)]">{visa.commonUses}</dd></div>
+              <div className="min-w-0 border-b border-[var(--hairline)] py-5 sm:pl-7"><dt className="text-sm normal-case tracking-normal text-[var(--stone)]">Validity</dt><dd className="mt-2 text-[15px] leading-6 text-[var(--ink)]">{visa.validity}</dd></div>
+              <div className="min-w-0 border-b border-[var(--hairline)] py-5 sm:border-r sm:pr-7"><dt className="text-sm normal-case tracking-normal text-[var(--stone)]">Entries</dt><dd className="mt-2 text-[15px] leading-6 text-[var(--ink)]">{visa.entries}</dd></div>
+              <div className="min-w-0 border-b border-[var(--hairline)] py-5 sm:pl-7"><dt className="text-sm normal-case tracking-normal text-[var(--stone)]">Typical processing</dt><dd className="mt-2 text-[15px] leading-6 text-[var(--ink)]">{visa.processing}</dd></div>
+              <div className="min-w-0 py-5 sm:border-r sm:pr-7"><dt className="text-sm normal-case tracking-normal text-[var(--stone)]">Demonstration fee</dt><dd className="mt-2 text-[15px] leading-6 text-[var(--ink)] tabular-nums">From ${visa.feeUsd} USD</dd></div>
+              <div className="min-w-0 py-5 sm:pl-7"><dt className="text-sm normal-case tracking-normal text-[var(--stone)]">Category</dt><dd className="mt-2 text-[15px] leading-6 text-[var(--ink)]">{visa.category}</dd></div>
             </dl>
           </section>
 
@@ -49,7 +49,7 @@ export function VisaTypeDetail() {
 
         <aside className="lg:border-l lg:border-[var(--hairline)] lg:pl-8">
           <Notice title="Prototype information">Fees, processing times and visa categories on this page are demonstration data. Always check official guidance before travelling.</Notice>
-          <div className="mt-8 border-t border-[var(--hairline)] pt-6"><p className="eyebrow text-[var(--stone)]">Ready to continue?</p><p className="mt-3 text-[15px] leading-6 text-[var(--stone)]">You can save your application and return to it later.</p><ButtonLink className="mt-5 w-full" to={`/apply?visaType=${encodeURIComponent(visa.slug)}`} trailingIcon={<ArrowRight aria-hidden="true" size={16} strokeWidth={1.5} />}>Start application</ButtonLink></div>
+          <div className="mt-8 border-t border-[var(--hairline)] pt-6"><p className="mt-3 text-[15px] leading-6 text-[var(--stone)]">You can save your application and return to it later.</p><ButtonLink className="mt-5 w-full" to={`/apply?visaType=${encodeURIComponent(visa.slug)}`} trailingIcon={<ArrowRight aria-hidden="true" size={16} strokeWidth={1.5} />}>Start application</ButtonLink></div>
         </aside>
       </div>
     </PageFrame>

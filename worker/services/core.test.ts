@@ -8,11 +8,11 @@ import { validateDocumentUpload } from './documents'
 const completeSections = {
   visa: { nationality: 'United States', visaCategory: 'Tourism', visaSubtype: 'e-tourist', purpose: 'Holiday', proposedArrival: '2099-10-10', arrivalPort: 'Delhi International Airport' },
   personal: { surname: 'Example', givenNames: 'Asha', gender: 'Female', dob: '1996-08-14', birthCity: 'Seattle', birthCountry: 'United States', citizenship: 'United States', religion: 'None', identificationMarks: 'None', education: 'University' },
-  passport: { passportNumber: 'P1234567', passportType: 'Ordinary', issuingCountry: 'United States', placeOfIssue: 'Seattle', issueDate: '2019-01-01', expiryDate: '2029-01-01' },
-  contact: { address1: '1 Main Street', city: 'Seattle', state: 'Washington', postalCode: '98101', country: 'United States', email: 'asha@example.test', mobile: '+12065550100' },
+  passport: { passportNumber: 'P1234567', passportType: 'Ordinary', issuingCountry: 'United States', placeOfIssue: 'Seattle', issueDate: '2019-01-01', expiryDate: '2100-01-01' },
+  contact: { sameAddress: true, address1: '1 Main Street', city: 'Seattle', state: 'Washington', postalCode: '98101', country: 'United States', email: 'asha@example.test', mobile: '+12065550100' },
   family: { fatherName: 'R Example', fatherNationality: 'United States', motherName: 'S Example', motherNationality: 'United States', maritalStatus: 'Single' },
   employment: { occupation: 'Designer', employer: 'Example Co', designation: 'Designer', employerAddress: '1 Main Street', employerPhone: '+12065550101', industry: 'Design' },
-  travel: { expectedArrival: '2099-10-10', expectedDeparture: '2099-10-20', arrivalPort: 'Delhi International Airport', places: 'Delhi', accommodationName: 'Demo Hotel', accommodationAddress: 'Delhi', indiaReference: 'Ravi', indiaReferencePhone: '+91115550100', homeReferenceName: 'R Example', homeReferenceRelationship: 'Father', homeReferencePhone: '+12065550102', homeReferenceAddress: '1 Main Street' },
+  travel: { previousVisit: 'no', tourLocations: 'Delhi', tourActivity: 'Sightseeing', expectedArrival: '2099-10-10', expectedDeparture: '2099-10-20', arrivalPort: 'Delhi International Airport', places: 'Delhi', accommodationName: 'Demo Hotel', accommodationAddress: 'Delhi', indiaReference: 'Ravi', indiaReferencePhone: '+91115550100', homeReferenceName: 'R Example', homeReferenceRelationship: 'Father', homeReferencePhone: '+12065550102', homeReferenceAddress: '1 Main Street' },
   background: { visaRefusal: false, deportation: false, conviction: false, immigrationViolation: false, restrictedTravel: false, declaration: true },
 } as const
 

@@ -20,7 +20,7 @@ export function Fees() {
 
       <div className="mt-12 grid gap-12 lg:grid-cols-[minmax(0,1fr)_minmax(300px,360px)] lg:gap-20">
         <section aria-labelledby="fee-calculator-heading" className="max-w-2xl">
-          <div className="flex items-start gap-4 border-b border-[var(--hairline)] pb-6"><span className="flex size-10 items-center justify-center border border-[var(--hairline)] bg-[var(--paper)]"><Calculator aria-hidden="true" className="text-[var(--orange)]" size={19} strokeWidth={1.35} /></span><div><p className="eyebrow text-[var(--stone)]">Demonstration calculator</p><h2 className="display mt-2 text-3xl" id="fee-calculator-heading">What would your journey cost?</h2></div></div>
+          <div className="flex items-start gap-4 border-b border-[var(--hairline)] pb-6"><span className="flex size-10 items-center justify-center border border-[var(--hairline)] bg-[var(--paper)]"><Calculator aria-hidden="true" className="text-[var(--orange)]" size={19} strokeWidth={1.35} /></span><div><h2 className="display mt-2 text-3xl" id="fee-calculator-heading">What would your journey cost?</h2></div></div>
           <div className="mt-8 grid gap-6 sm:grid-cols-2">
             <Field label="Nationality" htmlFor="fee-nationality"><SelectInput id="fee-nationality" value={nationality} onChange={(event) => setNationality(event.target.value)}>{countries.map((country) => <option key={country} value={country}>{country}</option>)}</SelectInput></Field>
             <Field label="Visa type" htmlFor="fee-visa-type"><SelectInput id="fee-visa-type" value={visaType} onChange={(event) => { setVisaType(event.target.value); setDuration('standard') }}>{visaTypes.map((visa) => <option key={visa.slug} value={visa.slug}>{visa.name}</option>)}</SelectInput></Field>
@@ -30,7 +30,7 @@ export function Fees() {
         </section>
 
         <aside className="h-fit rounded-3xl border border-[var(--hairline)] bg-[var(--paper)] p-6 md:p-8">
-          <p className="eyebrow text-[var(--stone)]">Fee summary</p>
+
           <h2 className="display mt-3 text-3xl">{selectedVisa.name}</h2>
           <p className="mt-2 text-[13px] text-[var(--stone)]">For applicants travelling on a {nationality} passport</p>
           <dl className="mt-8 border-y border-[var(--hairline)] py-2">

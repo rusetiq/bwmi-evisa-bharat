@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { useRef, useState } from 'react'
 import { Link, NavLink } from 'react-router-dom'
 import { Landmark, Menu, X, ArrowUpRight, FlaskConical } from 'lucide-react'
 import { cn } from '../ui/cn'
@@ -29,14 +29,21 @@ function Wordmark({ onClick }: { onClick?: () => void }) {
 
 export function SiteHeader() {
   const [open, setOpen] = useState(false)
+  const toggleRef = useRef<HTMLButtonElement>(null)
 
   return (
-    <header className="site-navbar sticky top-0 z-40 border-b border-[var(--hairline)] bg-[color:rgba(248,248,246,.96)] text-[var(--ink)] backdrop-blur-md">
+    <header className={cn('site-navbar top-0 z-40 border-b border-[var(--hairline)] bg-[color:rgba(248,248,246,.96)] text-[var(--ink)] backdrop-blur-md', open ? 'relative xl:sticky' : 'sticky')} onKeyDown={(event) => {
+      if (event.key === 'Escape' && open) {
+        event.preventDefault()
+        setOpen(false)
+        toggleRef.current?.focus()
+      }
+    }}>
       <div className="shell">
         <div className="flex min-h-[76px] items-center justify-between gap-5">
           <Wordmark onClick={() => setOpen(false)} />
 
-          <nav aria-label="Primary navigation" className="primary-navbar hidden items-center gap-4 lg:flex">
+          <nav aria-label="Primary navigation" className="primary-navbar hidden items-center gap-4 xl:flex">
             {primaryLinks.map((item) => (
               <NavLink
                 key={item.to}
@@ -49,16 +56,17 @@ export function SiteHeader() {
             ))}
           </nav>
 
-          <div className="navbar-actions hidden items-center gap-4 lg:flex">
+          <div className="navbar-actions hidden items-center gap-4 xl:flex">
             <Link className="focus-ring rounded-lg text-[14px] text-[var(--graphite)] hover:text-[var(--ink)]" to="/find-application">Find application</Link>
             <ButtonLink className="min-h-10 px-4" to="/apply" trailingIcon={<ArrowUpRight aria-hidden="true" size={16} strokeWidth={1.5} />}>Apply for e-Visa</ButtonLink>
           </div>
 
           <button
+            ref={toggleRef}
             aria-controls="mobile-navigation"
             aria-expanded={open}
             aria-label={open ? 'Close navigation menu' : 'Open navigation menu'}
-            className="navbar-toggle focus-ring inline-flex size-11 items-center justify-center rounded-lg border border-[var(--hairline)] bg-white lg:hidden"
+            className="navbar-toggle focus-ring inline-flex size-11 items-center justify-center rounded-lg border border-[var(--hairline)] bg-white xl:hidden"
             type="button"
             onClick={() => setOpen((value) => !value)}
           >
@@ -67,7 +75,7 @@ export function SiteHeader() {
         </div>
 
         {open && (
-          <nav id="mobile-navigation" aria-label="Mobile navigation" className="mobile-navbar border-t border-[var(--hairline)] py-4 lg:hidden">
+          <nav id="mobile-navigation" aria-label="Mobile navigation" className="mobile-navbar border-t border-[var(--hairline)] py-4 xl:hidden">
             <div className="grid gap-1">
               {primaryLinks.map((item) => (
                 <NavLink
@@ -87,7 +95,7 @@ export function SiteHeader() {
         )}
       </div>
       <div className="navbar-notice border-t border-[var(--hairline)] bg-white/70">
-        <Link className="shell flex min-h-8 items-center justify-center gap-2 text-[11px] text-[var(--stone)] hover:text-[var(--ink)]" to="/demo">
+        <Link className="shell flex min-h-8 items-center justify-center gap-2 px-1 py-1 text-center text-[11px] leading-4 text-[var(--stone)] hover:text-[var(--ink)] sm:whitespace-nowrap sm:py-0" to="/demo">
           <FlaskConical aria-hidden="true" className="text-[var(--orange)]" size={13} />Independent prototype · Try the seeded demo applications
         </Link>
       </div>

@@ -1,17 +1,17 @@
-import { useEffect, useMemo, useState } from 'react'
+import { useEffect, useState } from 'react'
 import { ArrowRight, RefreshCw } from 'lucide-react'
 import { Link } from 'react-router-dom'
 import { api, ApiError } from '../lib/api'
-import type { Application } from '../lib/types'
+import type { AdminApplicationSummary, AdminDashboard } from '../lib/types'
 import { Notice } from '../components/forms/FormPrimitives'
 import { EmptyState } from '../components/ui/EmptyState'
 import { Button, ButtonLink } from '../components/ui/Button'
 import { AdminApplicationsTable } from '../components/admin/AdminApplicationsTable'
 import { AdminPageHeader, AdminShell, AdminStatCard } from '../components/admin/AdminShell'
-import { sameCalendarDate } from '../components/admin/adminUtils'
 
 export default function Admin() {
-  const [applications, setApplications] = useState<Application[]>([])
+  const [reviewQueue, setApplications] = useState<AdminApplicationSummary[]>([])
+  const [stats, setStats] = useState<AdminDashboard['stats']>({ awaitingReview: 0, corrections: 0, paymentPending: 0, grantedToday: 0, rejected: 0 })
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState('')
   const [refreshKey, setRefreshKey] = useState(0)
@@ -22,8 +22,8 @@ export default function Admin() {
       setLoading(true)
       setError('')
       try {
-        const result = await api.adminApplications('?limit=200')
-        if (active) setApplications(result)
+        const result = await api.adminDashboard()
+        if (active) { setApplications(result.applications); setStats(result.stats) }
       } catch (requestError) {
         if (active) setError(requestError instanceof ApiError ? requestError.message : 'We could not load the review queue. Try again.')
       } finally {
@@ -34,23 +34,12 @@ export default function Admin() {
     return () => { active = false }
   }, [refreshKey])
 
-  const stats = useMemo(() => ({
-    awaitingReview: applications.filter((application) => application.status === 'UNDER_REVIEW').length,
-    corrections: applications.filter((application) => application.status === 'DOCUMENT_REUPLOAD_REQUIRED').length,
-    paymentPending: applications.filter((application) => application.status === 'PAYMENT_PENDING').length,
-    grantedToday: applications.filter((application) => application.status === 'GRANTED' && sameCalendarDate(application.updatedAt)).length,
-    rejected: applications.filter((application) => application.status === 'REJECTED').length,
-  }), [applications])
-
-  const reviewQueue = useMemo(() => applications.filter((application) => ['UNDER_REVIEW', 'DOCUMENT_REUPLOAD_REQUIRED', 'PAYMENT_PENDING'].includes(application.status)).slice(0, 6), [applications])
-
   return (
     <AdminShell>
       <AdminPageHeader
-        eyebrow="Review desk · demo data"
-        title="A clear view of the queue."
+        title="Admin Dashboard"
         intro="Review fictional e-Visa applications, request corrections and record decisions from one place."
-        actions={<Button variant="secondary" leadingIcon={<RefreshCw size={15} aria-hidden="true" />} onClick={() => setRefreshKey((value) => value + 1)} disabled={loading}>Refresh queue</Button>}
+        actions={<Button className="w-full sm:w-auto" variant="secondary" leadingIcon={<RefreshCw size={15} aria-hidden="true" />} onClick={() => setRefreshKey((value) => value + 1)} disabled={loading}>Refresh queue</Button>}
       />
 
       <div className="mt-8">
@@ -61,9 +50,8 @@ export default function Admin() {
 
       <section className="mt-8" aria-labelledby="admin-stats-heading">
         <div className="flex flex-wrap items-end justify-between gap-4">
-          <div>
-            <p className="eyebrow text-stone">Today’s snapshot</p>
-            <h2 id="admin-stats-heading" className="display mt-2 text-3xl">Work waiting for a decision</h2>
+          <div className="min-w-0">
+            <h2 id="admin-stats-heading" className="display break-words text-3xl">Work waiting for a decision</h2>
           </div>
           <Link className="focus-ring inline-flex items-center gap-2 rounded-lg text-sm text-[var(--graphite)] underline decoration-[var(--cobblestone)] underline-offset-4" to="/admin/applications">Open all applications <ArrowRight size={15} aria-hidden="true" /></Link>
         </div>
@@ -78,9 +66,8 @@ export default function Admin() {
 
       <section className="mt-12" aria-labelledby="admin-queue-heading">
         <div className="flex flex-wrap items-end justify-between gap-4 border-b border-[var(--hairline)] pb-4">
-          <div>
-            <p className="eyebrow text-stone">Priority queue</p>
-            <h2 id="admin-queue-heading" className="display mt-2 text-3xl">Applications needing attention</h2>
+          <div className="min-w-0">
+            <h2 id="admin-queue-heading" className="display break-words text-3xl">Applications needing attention</h2>
           </div>
           <Link className="focus-ring rounded-lg text-sm text-[var(--graphite)] underline decoration-[var(--cobblestone)] underline-offset-4" to="/admin/applications">Search and filter</Link>
         </div>

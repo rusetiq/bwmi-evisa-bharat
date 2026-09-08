@@ -134,13 +134,13 @@ export function Eligibility() {
               {result.eligible ? (
                 <div className="rounded-2xl border border-[var(--hairline)] bg-[var(--paper)] p-6 md:p-10">
                   <div className="flex size-11 items-center justify-center border border-[#7a9b82] bg-[#f2f7f3] text-[#356846]"><Check aria-hidden="true" size={22} strokeWidth={1.5} /></div>
-                  <p className="eyebrow mt-7 text-[var(--stone)]">Demonstration result</p>
+
                   <h2 className="display mt-3 text-balance text-4xl leading-tight md:text-5xl">You’re eligible for an {resultVisa.name}.</h2>
                   <p className="mt-5 max-w-xl text-[16px] leading-7 text-[var(--stone)] text-pretty">Based on the information provided, you can continue online in this prototype.</p>
                   <div className="mt-8 grid gap-5 border-y border-[var(--hairline)] py-6 sm:grid-cols-3">
-                    <div><p className="eyebrow text-[var(--stone)]">Approx. fee</p><p className="mt-2 text-[18px] font-medium tabular-nums">${fee?.total} USD</p></div>
-                    <div><p className="eyebrow text-[var(--stone)]">Entry allowance</p><p className="mt-2 text-[15px]">{resultVisa.entries}</p></div>
-                    <div><p className="eyebrow text-[var(--stone)]">Processing</p><p className="mt-2 text-[15px]">{resultVisa.processing}</p></div>
+                    <div><p className="text-sm font-medium normal-case tracking-normal text-[var(--stone)]">Approx. fee</p><p className="mt-2 text-[18px] font-medium tabular-nums">${fee?.total} USD</p></div>
+                    <div><p className="text-sm font-medium normal-case tracking-normal text-[var(--stone)]">Entry allowance</p><p className="mt-2 text-[15px]">{resultVisa.entries}</p></div>
+                    <div><p className="text-sm font-medium normal-case tracking-normal text-[var(--stone)]">Processing</p><p className="mt-2 text-[15px]">{resultVisa.processing}</p></div>
                   </div>
                   <h3 className="mt-8 text-[15px] font-medium">Have these ready</h3>
                   <ul className="mt-3 grid gap-2 text-[14px] leading-6 text-[var(--stone)] sm:grid-cols-2">{resultVisa.documents.map((document) => <li className="flex gap-2" key={document}><Check aria-hidden="true" className="mt-1 shrink-0 text-[var(--orange)]" size={15} strokeWidth={1.5} />{document}</li>)}</ul>
@@ -149,7 +149,7 @@ export function Eligibility() {
               ) : (
                 <div className="rounded-2xl border border-[var(--hairline)] bg-[var(--paper)] p-6 md:p-10">
                   <div className="flex size-11 items-center justify-center border border-[#d9691a] bg-[#fff7f0] text-[#9b4200]"><ShieldAlert aria-hidden="true" size={22} strokeWidth={1.5} /></div>
-                  <p className="eyebrow mt-7 text-[var(--stone)]">Demonstration result</p>
+
                   <h2 className="display mt-3 text-balance text-4xl leading-tight md:text-5xl">You may need a regular visa.</h2>
                   <p className="mt-5 max-w-xl text-[16px] leading-7 text-[var(--stone)] text-pretty">{result.reason}</p>
                   <Notice className="mt-7" tone="warning" title="What to do next">Visa rules can depend on details this checker does not ask about. Review the visa guidance before making travel arrangements.</Notice>
@@ -161,7 +161,7 @@ export function Eligibility() {
         </section>
 
         <aside className="border-t border-[var(--hairline)] pt-6 lg:border-l lg:border-t-0 lg:pl-8">
-          <p className="eyebrow text-[var(--stone)]">Good to know</p>
+
           <p className="mt-4 text-[15px] leading-7 text-[var(--stone)] text-pretty">This is an educational prototype. It does not replace official visa guidance or guarantee admission to India.</p>
           <Link className="focus-ring mt-5 inline-flex items-center gap-2 rounded-lg text-[14px] font-medium underline decoration-[var(--cobblestone)] decoration-1 underline-offset-4 hover:text-[var(--graphite)]" to="/requirements">Read requirements <ArrowRight aria-hidden="true" size={15} strokeWidth={1.5} /></Link>
         </aside>

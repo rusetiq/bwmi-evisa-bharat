@@ -1,24 +1,14 @@
+import { validateApplicationStep } from './applicationValidation'
 import type { ApplicationStatus, SectionData } from './types'
 
 export const applicationSteps = ['visa', 'personal', 'passport', 'contact', 'family', 'employment', 'travel', 'background'] as const
 
-const requiredByStep: Record<(typeof applicationSteps)[number], string[]> = {
-  visa: ['nationality', 'visaCategory', 'visaSubtype', 'purpose', 'proposedArrival', 'arrivalPort'],
-  personal: ['surname', 'givenNames', 'gender', 'dob', 'birthCity', 'birthCountry', 'citizenship', 'religion', 'identificationMarks', 'education'],
-  passport: ['passportNumber', 'passportType', 'issuingCountry', 'placeOfIssue', 'issueDate', 'expiryDate'],
-  contact: ['address1', 'city', 'state', 'postalCode', 'country', 'email', 'mobile'],
-  family: ['fatherName', 'fatherNationality', 'motherName', 'motherNationality', 'maritalStatus'],
-  employment: ['occupation', 'employer', 'designation', 'employerAddress', 'employerPhone', 'industry'],
-  travel: ['expectedArrival', 'expectedDeparture', 'arrivalPort', 'places', 'accommodationName', 'accommodationAddress', 'indiaReference', 'indiaReferencePhone', 'homeReferenceName', 'homeReferenceRelationship', 'homeReferencePhone', 'homeReferenceAddress'],
-  background: ['visaRefusal', 'deportation', 'conviction', 'immigrationViolation', 'restrictedTravel', 'declaration'],
-}
-
-export function isStepComplete(step: (typeof applicationSteps)[number], data: SectionData = {}) {
-  return requiredByStep[step].every((field) => data[field] !== undefined && data[field] !== '' && data[field] !== false)
+export function isStepComplete(step: (typeof applicationSteps)[number], data: SectionData = {}, sections: Record<string, SectionData> = {}) {
+  return Object.keys(validateApplicationStep(step, data, sections)).length === 0
 }
 
 export function getApplicationProgress(sections: Record<string, SectionData>) {
-  return applicationSteps.map((step) => ({ step, complete: isStepComplete(step, sections[step]) }))
+  return applicationSteps.map((step) => ({ step, complete: isStepComplete(step, sections[step], sections) }))
 }
 
 export function getNextRequiredStep(sections: Record<string, SectionData>) {
@@ -56,4 +46,9 @@ export function getApplicationPrimaryAction(status: ApplicationStatus) {
   if (status === 'DOCUMENT_REUPLOAD_REQUIRED') return { label: 'Replace requested document', kind: 'documents' }
   if (status === 'GRANTED') return { label: 'View ETA', kind: 'eta' }
   return null
+}
+
+export function calculateApplicationFee(application: { nationality: string; visaType: string; sections: Record<string, SectionData> }) {
+  const subtype = application.sections.visa?.visaSubtype
+  return calculateVisaFee(application.nationality, application.visaType, subtype === 'e-tourist-30' ? '30-days' : 'standard')
 }

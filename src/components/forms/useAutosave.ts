@@ -1,84 +1,68 @@
-import { useCallback, useEffect, useRef, useState } from 'react'
+import { useCallback, useEffect, useMemo, useState } from 'react'
 import { api, ApiError } from '../../lib/api'
 import type { SectionData } from '../../lib/types'
+import { createAutosaveQueue, type AutosaveSnapshot } from './autosaveQueue'
 
 export type SaveState = 'idle' | 'saving' | 'saved' | 'error'
 
-/** Persists only the changed fields in one compact section patch. */
-export function useAutosave(applicationId: string | undefined, section: string, data: SectionData, enabled = true) {
-  const [state, setState] = useState<SaveState>('idle')
+function saveTime() {
+  return new Intl.DateTimeFormat(undefined, { hour: 'numeric', minute: '2-digit' }).format(new Date())
+}
+
+export function useAutosave(applicationId: string | undefined, section: string, data: SectionData, enabled = true, initialVersion?: number) {
+  const [snapshot, setSnapshot] = useState<AutosaveSnapshot>({ state: 'idle', hasPending: false })
   const [message, setMessage] = useState('')
-  const lastSaved = useRef<SectionData>(data)
-  const pending = useRef<SectionData | null>(null)
-  const timer = useRef<ReturnType<typeof setTimeout> | undefined>(undefined)
-  const inFlight = useRef(false)
-  const scope = useRef('')
+  // Preserve versions across sections, while isolating different applications.
+  const version = useMemo(() => ({ current: initialVersion }), [applicationId])
+  const controller = useMemo(() => createAutosaveQueue(data, async (patch) => {
+    if (!applicationId) return
+    const update = () => api.updateApplication(applicationId, { section, data: patch, ...(typeof version.current === 'number' ? { version: version.current } : {}) })
+    let result
+    try {
+      result = await update()
+    } catch (error) {
+      if (!(error instanceof ApiError) || error.code !== 'VERSION_CONFLICT') throw error
+      const latest = await api.getApplication(applicationId)
+      version.current = latest.version
+      result = await update()
+    }
+    version.current = result.version
+  }), [applicationId, section, enabled, version])
 
   useEffect(() => {
-    const nextScope = `${applicationId ?? ''}:${section}`
-    if (scope.current !== nextScope) {
-      scope.current = nextScope
-      lastSaved.current = data
-      pending.current = null
-    }
-  }, [applicationId, data, section])
+    if (version.current === undefined) version.current = initialVersion
+    controller.initialize(data)
+  }, [controller, data, initialVersion, version])
 
-  const save = useCallback(async (patch: SectionData) => {
-    if (!applicationId || !Object.keys(patch).length) return
-    inFlight.current = true
-    setState('saving')
-    setMessage('Saving…')
-    let didSucceed = false
-    try {
-      const result = await api.updateApplication(applicationId, { section, data: patch })
-      lastSaved.current = { ...lastSaved.current, ...patch }
-      setState('saved')
-      setMessage(`Saved just now${result.version ? ` · v${result.version}` : ''}`)
-      didSucceed = true
-    } catch (error) {
-      pending.current = { ...(pending.current ?? {}), ...patch }
-      setState('error')
-      setMessage(error instanceof ApiError ? error.message : "We couldn't save your changes. Try again.")
-    } finally {
-      inFlight.current = false
-      if (didSucceed && pending.current && Object.keys(pending.current).length) {
-        const retryPatch = pending.current
-        pending.current = null
-        void save(retryPatch)
-      }
+  useEffect(() => {
+    const unsubscribe = controller.subscribe((next) => {
+      setSnapshot(next)
+      setMessage(next.state === 'error'
+        ? next.error instanceof ApiError ? next.error.message : "We couldn't save your changes. Try again."
+        : next.state === 'saving' ? 'Saving changes…'
+          : next.state === 'saved' ? `Saved at ${saveTime()} · v${version.current}` : '')
+    })
+    return () => {
+      unsubscribe()
+      // Old scopes own their pending requests and cannot mutate the new queue.
+      void controller.flush()
     }
-  }, [applicationId, section])
+  }, [controller, version])
 
   const queue = useCallback((next: SectionData) => {
-    if (!enabled || !applicationId) return
-    const patch = Object.keys(next).reduce<SectionData>((result, key) => {
-      if (next[key] !== lastSaved.current[key]) result[key] = next[key]
-      return result
-    }, {})
-    if (!Object.keys(patch).length) return
-    if (inFlight.current) {
-      pending.current = { ...(pending.current ?? {}), ...patch }
-      return
+    if (enabled && applicationId) controller.queue(next)
+  }, [applicationId, controller, enabled])
+  const retry = useCallback(() => { void controller.flush() }, [controller])
+
+  useEffect(() => {
+    const warnBeforeUnload = (event: BeforeUnloadEvent) => {
+      if (!controller.getSnapshot().hasPending) return
+      event.preventDefault()
+      event.returnValue = ''
     }
-    if (timer.current) clearTimeout(timer.current)
-    timer.current = setTimeout(() => {
-      timer.current = undefined
-      void save(patch)
-    }, 600)
-    setState('saving')
-    setMessage('Saving…')
-  }, [applicationId, enabled, save])
+    window.addEventListener('beforeunload', warnBeforeUnload)
+    return () => window.removeEventListener('beforeunload', warnBeforeUnload)
+  }, [controller])
 
-  useEffect(() => () => {
-    if (timer.current) clearTimeout(timer.current)
-  }, [])
-
-  const retry = useCallback(() => {
-    if (!pending.current) return
-    const retryPatch = pending.current
-    pending.current = null
-    void save(retryPatch)
-  }, [save])
-
-  return { state, message, queue, retry }
+  return { state: snapshot.state, message, hasPending: snapshot.hasPending, queue, retry, flush: controller.flush }
 }

@@ -1,6 +1,8 @@
-import type { ApiResult, Application, EligibilityInput, EligibilityResult, EntryPoint, VisaType } from './types'
+import type { AdminApplicationSummary, AdminApplicationsPage, AdminDashboard, ApiResult, Application, EligibilityInput, EligibilityResult, EntryPoint, VisaType } from './types'
 
-export class ApiError extends Error { constructor(message: string, public status = 500, public fields?: Record<string, string>) { super(message) } }
+export class ApiError extends Error {
+  constructor(message: string, public status = 500, public fields?: Record<string, string>, public code?: string) { super(message) }
+}
 
 async function request<T>(path: string, init?: RequestInit): Promise<T> {
   const response = await fetch(`/api${path}`, { ...init, headers: { ...(init?.body instanceof FormData ? {} : { 'Content-Type': 'application/json' }), ...init?.headers } })
@@ -11,11 +13,11 @@ async function request<T>(path: string, init?: RequestInit): Promise<T> {
     throw new ApiError('The service returned an unreadable response.', response.status)
   }
   if (!response.ok) {
-    if (isApiErrorResult(payload)) throw new ApiError(payload.error.message, response.status, payload.error.fields)
+    if (isApiErrorResult(payload)) throw new ApiError(payload.error.message, response.status, payload.error.fields, payload.error.code)
     throw new ApiError('Request failed. Please try again.', response.status)
   }
   if (!isApiSuccessResult<T>(payload)) {
-    if (isApiErrorResult(payload)) throw new ApiError(payload.error.message, response.status, payload.error.fields)
+    if (isApiErrorResult(payload)) throw new ApiError(payload.error.message, response.status, payload.error.fields, payload.error.code)
     throw new ApiError('The service returned an invalid response.', response.status)
   }
   return payload.data
@@ -25,7 +27,7 @@ function isApiSuccessResult<T>(value: unknown): value is { ok: true; data: T } {
   return Boolean(value && typeof value === 'object' && (value as { ok?: unknown }).ok === true && 'data' in value)
 }
 
-function isApiErrorResult(value: unknown): value is { ok: false; error: { message: string; fields?: Record<string, string> } } {
+function isApiErrorResult(value: unknown): value is { ok: false; error: { message: string; code?: string; fields?: Record<string, string> } } {
   if (!value || typeof value !== 'object') return false
   const candidate = value as { ok?: unknown; error?: unknown }
   if (candidate.ok !== false || !candidate.error || typeof candidate.error !== 'object') return false
@@ -45,7 +47,14 @@ export const api = {
   findApplication: (body: unknown) => request<{ publicId: string }>('/applications/find', { method: 'POST', body: JSON.stringify(body) }),
   checkEligibility: (body: EligibilityInput) => request<EligibilityResult>('/eligibility', { method: 'POST', body: JSON.stringify(body) }),
   publicData: () => request<{ visaTypes: VisaType[]; entryPoints: EntryPoint[] }>('/public-data'),
-  adminApplications: (query = '') => request<Application[]>(`/admin/applications${query}`, { headers: adminHeaders }),
+  adminApplications: (query = '') => request<AdminApplicationSummary[]>(`/admin/applications${query}`, { headers: adminHeaders }),
+  adminApplicationsPage: (query = '') => request<AdminApplicationsPage>(`/admin/application-page${query}`, { headers: adminHeaders }),
+  adminDashboard: () => {
+    const start = new Date()
+    start.setHours(0, 0, 0, 0)
+    return request<AdminDashboard>(`/admin/dashboard?dayStart=${encodeURIComponent(start.toISOString())}`, { headers: adminHeaders })
+  },
   adminApplication: (id: string) => request<Application>(`/admin/applications/${id}`, { headers: adminHeaders }),
   adminAction: (id: string, action: string, body: unknown) => request<Application>(`/admin/applications/${id}/${action}`, { method: 'POST', headers: adminHeaders, body: JSON.stringify(body) }),
+  resetDemoApplication: (id: string) => request<Application>(`/admin/applications/${id}/reset-demo`, { method: 'POST', headers: adminHeaders, body: '{}' }),
 }

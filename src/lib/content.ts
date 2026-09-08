@@ -22,11 +22,51 @@ export const statusCopy = {
   DRAFT: 'Draft', READY_TO_SUBMIT: 'Ready to submit', SUBMITTED: 'Submitted', PAYMENT_PENDING: 'Payment pending', UNDER_REVIEW: 'Under review', DOCUMENT_REUPLOAD_REQUIRED: 'Action required', GRANTED: 'Granted', REJECTED: 'Decision made',
 } as const
 
-export const demoLookups = [
-  ['IND-EV-26-DEMO01', 'P1234567', '1996-08-14', 'Maya Thompson — draft'],
-  ['IND-EV-26-DEMO02', 'C01X8831', '1988-02-19', 'Daniel Weber — payment pending'],
-  ['IND-EV-26-DEMO03', '22FV61948', '1992-11-03', 'Sophie Martin — under review'],
-  ['IND-EV-26-DEMO04', 'TR4901812', '1985-05-22', 'Kenji Sato — document replacement'],
-  ['IND-EV-26-DEMO05', 'N8406713', '1990-07-10', 'Amelia Wilson — granted'],
-  ['IND-EV-26-DEMO06', 'A7843021', '1983-12-04', 'Omar Al Mansoori — decision made'],
+export type DemoScenario = {
+  publicId: string
+  passportNumber: string
+  dob: string
+  applicant: string
+  status: keyof typeof statusCopy
+  title: string
+  whatYouSee: string
+  steps: number
+  launchLabel: string
+  launchPath: string
+}
+
+export const demoScenarios: DemoScenario[] = [
+  {
+    publicId: 'IND-EV-26-DEMO01', passportNumber: 'P1234567', dob: '1996-08-14', applicant: 'Maya Thompson', status: 'DRAFT',
+    title: 'Resume a draft', whatYouSee: 'A partially completed tourist application with autosave and the remaining form steps ready to explore.', steps: 3, launchLabel: 'Resume draft', launchPath: '/find-application?applicationId=IND-EV-26-DEMO01&passport=P1234567&dob=1996-08-14',
+  },
+  {
+    publicId: 'IND-EV-26-DEMO02', passportNumber: 'C01X8831', dob: '1988-02-19', applicant: 'Daniel Weber', status: 'PAYMENT_PENDING',
+    title: 'Complete a payment', whatYouSee: 'A submitted business application waiting for a selectable fictional payment outcome.', steps: 2, launchLabel: 'Open payment', launchPath: '/application/IND-EV-26-DEMO02',
+  },
+  {
+    publicId: 'IND-EV-26-DEMO03', passportNumber: '22FV61948', dob: '1992-11-03', applicant: 'Sophie Martin', status: 'UNDER_REVIEW',
+    title: 'Follow an application under review', whatYouSee: 'A paid application with received documents, review messaging and a complete event timeline.', steps: 2, launchLabel: 'View review status', launchPath: '/application/IND-EV-26-DEMO03',
+  },
+  {
+    publicId: 'IND-EV-26-DEMO04', passportNumber: 'TR4901812', dob: '1985-05-22', applicant: 'Kenji Sato', status: 'DOCUMENT_REUPLOAD_REQUIRED',
+    title: 'Replace a requested document', whatYouSee: 'A business application where the passport scan was flagged and a replacement upload can continue review.', steps: 3, launchLabel: 'Open document request', launchPath: '/application/IND-EV-26-DEMO04',
+  },
+  {
+    publicId: 'IND-EV-26-DEMO05', passportNumber: 'N8406713', dob: '1990-07-10', applicant: 'Amelia Wilson', status: 'GRANTED',
+    title: 'View a granted ETA', whatYouSee: 'A finished tourist application with a fictional ETA ready to view, print and verify.', steps: 2, launchLabel: 'View granted ETA', launchPath: '/application/IND-EV-26-DEMO05',
+  },
+  {
+    publicId: 'IND-EV-26-DEMO06', passportNumber: 'A7843021', dob: '1983-12-04', applicant: 'Omar Al Mansoori', status: 'REJECTED',
+    title: 'Review a decision', whatYouSee: 'A completed conference application showing a recorded mock decision and reason in its history.', steps: 2, launchLabel: 'View decision', launchPath: '/application/IND-EV-26-DEMO06',
+  },
 ]
+
+export type DemoLookup = [string, string, string, string]
+
+export const demoLookups: DemoLookup[] = demoScenarios.map((scenario) => [
+  scenario.publicId,
+  scenario.passportNumber,
+  scenario.dob,
+  `${scenario.applicant} — ${statusCopy[scenario.status].toLowerCase()}`,
+])

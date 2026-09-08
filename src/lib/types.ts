@@ -25,6 +25,7 @@ export type Application = {
   applicantName: string
   dob: string
   passportNumber: string
+  version?: number
   createdAt: string
   updatedAt: string
   submittedAt?: string
@@ -42,6 +43,7 @@ export type DocumentRecord = {
   documentType: string
   originalFilename: string
   mimeType: string
+  sizeBytes?: number
   status: DocumentStatus
   rejectionReason?: string
   uploadedAt: string
@@ -87,4 +89,10 @@ export type EligibilityResult = {
   visa?: { slug: string; name: string; entries: string; validity: string; documents: string[] }
   earliestApplicationDate?: string
   latestApplicationDate?: string
+}
+export type AdminApplicationSummary = Pick<Application, 'id' | 'publicId' | 'status' | 'nationality' | 'visaType' | 'visaTypeName' | 'applicantName' | 'passportNumber' | 'updatedAt' | 'submittedAt'>
+export type AdminApplicationsPage = { items: AdminApplicationSummary[]; nextCursor: string | null }
+export type AdminDashboard = {
+  stats: { awaitingReview: number; corrections: number; paymentPending: number; grantedToday: number; rejected: number }
+  applications: AdminApplicationSummary[]
 }

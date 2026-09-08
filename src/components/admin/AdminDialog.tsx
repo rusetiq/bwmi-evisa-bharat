@@ -35,7 +35,7 @@ export function AdminDialog({ open, onClose, title, description, children, class
   return (
     <dialog
       ref={dialogRef}
-      className={cn('m-auto w-[calc(100%-2rem)] max-w-2xl border border-[var(--ink)] bg-[var(--paper)] p-0 text-[var(--ink)] backdrop:bg-[rgb(31_28_27_/_45%)]', className)}
+      className={cn('m-auto max-h-[calc(100dvh-2rem)] w-[calc(100%-2rem)] max-w-2xl overflow-y-auto overscroll-contain border border-[var(--ink)] bg-[var(--paper)] p-0 text-[var(--ink)] backdrop:bg-[rgb(31_28_27_/_45%)]', className)}
       aria-labelledby={titleId}
       aria-describedby={description ? descriptionId : undefined}
       aria-modal="true"

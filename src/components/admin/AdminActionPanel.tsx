@@ -36,7 +36,9 @@ export function AdminActionPanel({ application, onUpdated }: { application: Appl
     setError('')
     setReason('')
     setReasonCategory('Image unclear')
-    setDocumentId(String(documents.find((document) => document.status === 'REUPLOAD_REQUIRED')?.id ?? documents[0]?.id ?? ''))
+    if (!documents.some((document) => String(document.id) === documentId)) {
+      setDocumentId(String(documents.find((document) => document.status === 'REUPLOAD_REQUIRED')?.id ?? documents[0]?.id ?? ''))
+    }
     setDialog('request-document')
   }
 
@@ -117,7 +119,6 @@ export function AdminActionPanel({ application, onUpdated }: { application: Appl
     <section className="border border-[var(--ink)] bg-[var(--linen)] p-5 sm:p-6" aria-labelledby="admin-actions-heading">
       <div className="flex flex-col gap-4 sm:flex-row sm:items-start sm:justify-between">
         <div>
-          <p className="eyebrow text-stone">Officer actions</p>
           <h2 id="admin-actions-heading" className="display mt-2 text-3xl">Review this application</h2>
           <p className="mt-2 max-w-xl text-sm leading-6 text-stone">Actions are persisted to the demo database and create a visible applicant update and audit event.</p>
         </div>
@@ -133,12 +134,12 @@ export function AdminActionPanel({ application, onUpdated }: { application: Appl
           </select>
           <p className="mt-1.5 text-[13px] leading-5 text-stone">Choose the file that needs a clearer or corrected replacement.</p>
         </div>
-        <Button variant="orange-outline" leadingIcon={<FileWarning size={16} aria-hidden="true" />} onClick={openRequestDialog} disabled={!canRequestDocument}>Request document replacement</Button>
+        <Button className="w-full lg:w-auto" variant="orange-outline" leadingIcon={<FileWarning size={16} aria-hidden="true" />} onClick={openRequestDialog} disabled={!canRequestDocument}>Request document replacement</Button>
       </div>
 
       <div className="mt-5 flex flex-col gap-3 border-t border-[var(--hairline)] pt-5 sm:flex-row sm:flex-wrap sm:items-center">
-        <Button leadingIcon={<ShieldCheck size={16} aria-hidden="true" />} onClick={openGrantDialog} disabled={!canGrant} title={!final && !paymentReady ? 'A successful payment is required before granting.' : undefined}>Grant visa</Button>
-        <Button variant="secondary" leadingIcon={<XCircle size={16} aria-hidden="true" />} onClick={openRejectDialog} disabled={!canReject}>Reject application</Button>
+        <Button className="w-full sm:w-auto" leadingIcon={<ShieldCheck size={16} aria-hidden="true" />} onClick={openGrantDialog} disabled={!canGrant} title={!final && !paymentReady ? 'A successful payment is required before granting.' : undefined}>Grant visa</Button>
+        <Button className="w-full sm:w-auto" variant="secondary" leadingIcon={<XCircle size={16} aria-hidden="true" />} onClick={openRejectDialog} disabled={!canReject}>Reject application</Button>
         {final && <p className="text-xs text-stone">This application is closed and cannot receive another decision.</p>}
         {!final && !paymentReady && <p className="text-xs text-stone">Granting becomes available after payment is received.</p>}
       </div>
@@ -150,8 +151,8 @@ export function AdminActionPanel({ application, onUpdated }: { application: Appl
           <TextareaField id="request-document-message" label="Additional message" value={reason} onChange={setReason} hint="Explain what the applicant should correct. Keep the message concise." placeholder="For example: The lower edge of the passport bio page is cropped." required rows={4} />
           {error && <Notice title="We could not submit the request." tone="danger">{error}</Notice>}
           <div className="flex flex-col-reverse gap-3 border-t border-[var(--hairline)] pt-5 sm:flex-row sm:justify-end">
-            <button type="button" className="btn btn-secondary" onClick={closeDialog} disabled={Boolean(busy)}>Cancel</button>
-            <Button type="submit" variant="primary" disabled={busy !== null} aria-busy={busy === 'request-document'}>{busy === 'request-document' ? 'Requesting…' : 'Request replacement'}</Button>
+            <button type="button" className="btn btn-secondary w-full sm:w-auto" onClick={closeDialog} disabled={Boolean(busy)}>Cancel</button>
+            <Button className="w-full sm:w-auto" type="submit" variant="primary" disabled={busy !== null} aria-busy={busy === 'request-document'}>{busy === 'request-document' ? 'Requesting…' : 'Request replacement'}</Button>
           </div>
         </form>
       </AdminDialog>
@@ -168,8 +169,8 @@ export function AdminActionPanel({ application, onUpdated }: { application: Appl
           <div className="rounded-2xl border border-[var(--hairline)] bg-[var(--linen)] px-4 py-3 text-sm leading-6"><p className="font-medium">Ready to grant {application.applicantName || 'this applicant'}?</p><p className="mt-1 text-stone">The application will move to Granted and the applicant will be able to view the ETA.</p></div>
           {error && <Notice title="We could not grant this application." tone="danger">{error}</Notice>}
           <div className="flex flex-col-reverse gap-3 border-t border-[var(--hairline)] pt-5 sm:flex-row sm:justify-end">
-            <button type="button" className="btn btn-secondary" onClick={closeDialog} disabled={Boolean(busy)}>Cancel</button>
-            <Button type="submit" disabled={busy !== null} aria-busy={busy === 'grant'}>{busy === 'grant' ? 'Granting…' : 'Confirm grant'}</Button>
+            <button type="button" className="btn btn-secondary w-full sm:w-auto" onClick={closeDialog} disabled={Boolean(busy)}>Cancel</button>
+            <Button className="w-full sm:w-auto" type="submit" disabled={busy !== null} aria-busy={busy === 'grant'}>{busy === 'grant' ? 'Granting…' : 'Confirm grant'}</Button>
           </div>
         </form>
       </AdminDialog>
@@ -180,8 +181,8 @@ export function AdminActionPanel({ application, onUpdated }: { application: Appl
           <TextareaField id="reject-explanation" label="Short explanation" value={explanation} onChange={setExplanation} hint="This will be included in the application decision history." placeholder="Add a clear, neutral explanation." required rows={4} />
           {error && <Notice title="We could not record the rejection." tone="danger">{error}</Notice>}
           <div className="flex flex-col-reverse gap-3 border-t border-[var(--hairline)] pt-5 sm:flex-row sm:justify-end">
-            <button type="button" className="btn btn-secondary" onClick={closeDialog} disabled={Boolean(busy)}>Cancel</button>
-            <Button type="submit" variant="secondary" disabled={busy !== null} aria-busy={busy === 'reject'}>{busy === 'reject' ? 'Recording…' : 'Confirm rejection'}</Button>
+            <button type="button" className="btn btn-secondary w-full sm:w-auto" onClick={closeDialog} disabled={Boolean(busy)}>Cancel</button>
+            <Button className="w-full sm:w-auto" type="submit" variant="secondary" disabled={busy !== null} aria-busy={busy === 'reject'}>{busy === 'reject' ? 'Recording…' : 'Confirm rejection'}</Button>
           </div>
         </form>
       </AdminDialog>

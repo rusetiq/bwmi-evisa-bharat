@@ -1,34 +1,42 @@
-import { Route, Routes } from 'react-router-dom'
+import { lazy, Suspense } from 'react'
+import { Route, Routes, useLocation } from 'react-router-dom'
+import { RouteErrorBoundary } from '@/components/layout/RouteErrorBoundary'
+import { RouteExperience } from '@/components/layout/RouteExperience'
 import { PublicLayout } from '@/components/layout/PublicLayout'
 import Home from '@/pages/Home'
-import Eligibility from '@/pages/Eligibility'
-import VisaTypes from '@/pages/VisaTypes'
-import VisaTypeDetail from '@/pages/VisaTypeDetail'
-import Requirements from '@/pages/Requirements'
-import EntryPoints from '@/pages/EntryPoints'
-import Fees from '@/pages/Fees'
-import Help from '@/pages/Help'
-import Demo from '@/pages/Demo'
-import Apply from '@/pages/Apply'
-import ApplicationWizard from '@/pages/ApplicationWizard'
-import Documents from '@/pages/Documents'
-import Review from '@/pages/Review'
-import Submitted from '@/pages/Submitted'
-import Payment from '@/pages/Payment'
-import PaymentVerify from '@/pages/PaymentVerify'
-import FindApplication from '@/pages/FindApplication'
-import ApplicationDashboard from '@/pages/ApplicationDashboard'
-import Eta from '@/pages/Eta'
-import PrintApplication from '@/pages/PrintApplication'
-import Admin from '@/pages/Admin'
-import AdminApplications from '@/pages/AdminApplications'
-import AdminApplicationReview from '@/pages/AdminApplicationReview'
-import NotFound from '@/pages/NotFound'
+const Eligibility = lazy(() => import('@/pages/Eligibility'))
+const VisaTypes = lazy(() => import('@/pages/VisaTypes'))
+const VisaTypeDetail = lazy(() => import('@/pages/VisaTypeDetail'))
+const Requirements = lazy(() => import('@/pages/Requirements'))
+const EntryPoints = lazy(() => import('@/pages/EntryPoints'))
+const Fees = lazy(() => import('@/pages/Fees'))
+const Help = lazy(() => import('@/pages/Help'))
+const Demo = lazy(() => import('@/pages/Demo'))
+const Apply = lazy(() => import('@/pages/Apply'))
+const ApplicationWizard = lazy(() => import('@/pages/ApplicationWizard'))
+const Documents = lazy(() => import('@/pages/Documents'))
+const Review = lazy(() => import('@/pages/Review'))
+const Submitted = lazy(() => import('@/pages/Submitted'))
+const Payment = lazy(() => import('@/pages/Payment'))
+const PaymentVerify = lazy(() => import('@/pages/PaymentVerify'))
+const FindApplication = lazy(() => import('@/pages/FindApplication'))
+const ApplicationDashboard = lazy(() => import('@/pages/ApplicationDashboard'))
+const Eta = lazy(() => import('@/pages/Eta'))
+const PrintApplication = lazy(() => import('@/pages/PrintApplication'))
+const Admin = lazy(() => import('@/pages/Admin'))
+const AdminApplications = lazy(() => import('@/pages/AdminApplications'))
+const AdminApplicationReview = lazy(() => import('@/pages/AdminApplicationReview'))
+const NotFound = lazy(() => import('@/pages/NotFound'))
 
 export function App() {
+  const { pathname } = useLocation()
   return (
-    <PublicLayout>
+    <>
+      <RouteExperience />
+      <RouteErrorBoundary key={pathname}>
+      <Suspense fallback={<main id="main-content" tabIndex={-1} className="shell min-h-[70vh] py-20" aria-busy="true"><p role="status">Loading page…</p></main>}>
       <Routes>
+        <Route element={<PublicLayout />}>
         <Route path="/" element={<Home />} />
         <Route path="/eligibility" element={<Eligibility />} />
         <Route path="/visa-types" element={<VisaTypes />} />
@@ -50,11 +58,14 @@ export function App() {
         <Route path="/application/:applicationId/documents" element={<Documents />} />
         <Route path="/application/:applicationId/eta" element={<Eta />} />
         <Route path="/application/:applicationId/print" element={<PrintApplication />} />
+        <Route path="*" element={<NotFound />} />
+        </Route>
         <Route path="/admin" element={<Admin />} />
         <Route path="/admin/applications" element={<AdminApplications />} />
         <Route path="/admin/applications/:applicationId" element={<AdminApplicationReview />} />
-        <Route path="*" element={<NotFound />} />
       </Routes>
-    </PublicLayout>
+      </Suspense>
+      </RouteErrorBoundary>
+    </>
   )
 }

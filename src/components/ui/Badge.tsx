@@ -8,9 +8,9 @@ export function Badge({ children, tone = 'neutral', className }: { children: Rea
 }
 
 export function Eyebrow({ children, className }: { children: ReactNode; className?: string }) {
-  return <p className={cn('eyebrow text-[var(--stone)]', className)}>{children}</p>
+  return <p className={cn('text-sm normal-case tracking-normal text-[var(--stone)]', className)}>{children}</p>
 }
 
 export function Kicker({ children, className }: { children: ReactNode; className?: string }) {
-  return <span className={cn('eyebrow text-[var(--stone)]', className)}>{children}</span>
+  return <span className={cn('text-sm normal-case tracking-normal text-[var(--stone)]', className)}>{children}</span>
 }

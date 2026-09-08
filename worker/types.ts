@@ -7,7 +7,7 @@ export type Bindings = {
   ASSETS?: Fetcher
 }
 
-export type AppEnv = { Bindings: Bindings }
+export type AppEnv = { Bindings: Bindings; Variables: { requestId: string } }
 
 export type ApplicationRow = {
   id: number

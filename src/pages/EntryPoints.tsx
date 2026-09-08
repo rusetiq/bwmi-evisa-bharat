@@ -20,7 +20,7 @@ export function EntryPoints() {
 
   return (
     <PageFrame>
-      <PageIntro eyebrow="Arriving in India" title="Choose an entry point with confidence." intro="Browse representative airports, seaports, land crossings and rail check posts in this demonstration list." />
+      <PageIntro title="Choose an entry point with confidence." intro="Browse representative airports, seaports, land crossings and rail check posts in this demonstration list." />
 
       <section aria-labelledby="entry-points-filter-heading" className="mt-10">
         <h2 className="sr-only" id="entry-points-filter-heading">Filter entry points</h2>

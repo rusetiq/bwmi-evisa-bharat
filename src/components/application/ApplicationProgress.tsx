@@ -9,9 +9,9 @@ export function ApplicationProgress({ application, currentStep, onStepChange }: 
   const requiredDocuments = getRequiredDocuments(normalizeVisaType(application.visaType))
   const items = [...progress, { step: 'documents', complete: requiredDocuments.every((type) => application.documents?.some((document) => document.documentType === type && ['UPLOADED', 'ACCEPTED', 'REPLACED'].includes(document.status))) }, { step: 'review', complete: ['SUBMITTED', 'PAYMENT_PENDING', 'UNDER_REVIEW', 'DOCUMENT_REUPLOAD_REQUIRED', 'GRANTED', 'REJECTED'].includes(application.status) }]
   return (
-    <nav aria-label="Application progress" className="border-b border-[var(--hairline)] bg-[var(--linen)] lg:border-b-0 lg:border-r">
+    <nav aria-label="Application progress" className="min-w-0 border-b border-[var(--hairline)] bg-[var(--linen)] lg:border-b-0 lg:border-r">
       <div className="flex gap-2 overflow-x-auto px-4 py-3 lg:block lg:w-56 lg:px-5 lg:py-8">
-        <p className="eyebrow mb-5 hidden text-stone lg:block">Application progress</p>
+
         {items.map((item, index) => {
           const isCurrent = currentStep === item.step
           const canNavigate = Boolean(onStepChange) && (item.complete || isCurrent)
@@ -39,7 +39,7 @@ export function ApplicationProgress({ application, currentStep, onStepChange }: 
 function isComplete(application: Application, step: string) {
   const section = application.sections?.[step]
   if (!section) return false
-  return applicationSteps.includes(step as typeof applicationSteps[number]) ? isStepComplete(step as typeof applicationSteps[number], section) : false
+  return applicationSteps.includes(step as typeof applicationSteps[number]) ? isStepComplete(step as typeof applicationSteps[number], section, application.sections) : false
 }
 
 function normalizeVisaType(value: string) { return value.startsWith('e-tourist-') ? 'e-tourist' : value }

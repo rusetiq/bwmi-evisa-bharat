@@ -39,7 +39,10 @@ export function Home() {
           </div>
 
           <div className="hero-art relative aspect-[3/4] min-w-0 w-full overflow-hidden rounded-2xl bg-black shadow-[var(--shadow-paper)] sm:rounded-3xl">
-            <img className="hero-photo absolute inset-0 block h-full w-full object-cover object-top" src="/india-gateway.jpg" alt="India Gate beneath a ceremonial aircraft formation trailing the colours of the Indian flag" width="958" height="1800" fetchPriority="high" />
+            <picture className="absolute inset-0 block h-full w-full">
+              <source srcSet="/india-gateway.avif?v=2d78b725" type="image/avif" />
+              <img className="hero-photo absolute inset-0 block h-full w-full object-cover object-top" src="/india-gateway.jpg" alt="India Gate beneath a ceremonial aircraft formation trailing the colours of the Indian flag" width="1233" height="1600" fetchPriority="high" decoding="async" />
+            </picture>
           </div>
         </PageFrame>
       </section>

@@ -5,6 +5,7 @@ import '@fontsource/fraunces/latin.css'
 import '@fontsource-variable/geist'
 import './styles.css'
 import { App } from './app/App'
+import { startVitals } from './lib/vitals'
 
 ReactDOM.createRoot(document.getElementById('root')!).render(
   <React.StrictMode>
@@ -13,3 +14,5 @@ ReactDOM.createRoot(document.getElementById('root')!).render(
     </BrowserRouter>
   </React.StrictMode>,
 )
+
+startVitals()

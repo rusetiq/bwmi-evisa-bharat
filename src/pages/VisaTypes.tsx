@@ -42,17 +42,17 @@ export function VisaTypes() {
         {filtered.length ? (
           <div className="mt-3 grid border-t border-[var(--hairline)] md:grid-cols-2">
             {filtered.map((visa) => (
-              <article className="border-b border-[var(--hairline)] py-8 md:px-7 md:odd:border-r md:even:pl-8 lg:px-9 lg:odd:pl-0 lg:even:pl-9" key={visa.slug}>
+              <article className="min-w-0 border-b border-[var(--hairline)] py-8 md:px-7 md:odd:border-r md:even:pl-8 lg:px-9 lg:odd:pl-0 lg:even:pl-9" key={visa.slug}>
                 <div className="mt-4 flex items-start justify-between gap-5">
                   <h2 className="display text-3xl leading-tight md:text-4xl">{visa.name}</h2>
                   <ArrowUpRight aria-hidden="true" className="mt-1 shrink-0 text-[var(--stone)]" size={20} strokeWidth={1.35} />
                 </div>
                 <p className="mt-4 max-w-xl text-[15px] leading-7 text-[var(--stone)] text-pretty">{visa.description}</p>
-                <dl className="mt-7 grid grid-cols-2 gap-x-4 gap-y-5 border-y border-[var(--hairline)] py-5 sm:grid-cols-4">
-                  <div><dt className="eyebrow text-[var(--stone)]">Validity</dt><dd className="mt-2 text-[14px]">{visa.validity}</dd></div>
-                  <div><dt className="eyebrow text-[var(--stone)]">Entries</dt><dd className="mt-2 text-[14px]">{visa.entries}</dd></div>
-                  <div><dt className="eyebrow text-[var(--stone)]">Fee from</dt><dd className="mt-2 text-[14px] tabular-nums">${visa.feeUsd} USD</dd></div>
-                  <div><dt className="eyebrow text-[var(--stone)]">Timing</dt><dd className="mt-2 text-[14px]">{visa.processing}</dd></div>
+                <dl className="mt-7 grid grid-cols-2 gap-x-4 gap-y-5 border-y border-[var(--hairline)] py-5 sm:grid-cols-2 lg:grid-cols-4">
+                  <div className="min-w-0"><dt className="text-sm normal-case tracking-normal text-[var(--stone)]">Validity</dt><dd className="mt-2 text-[14px]">{visa.validity}</dd></div>
+                  <div className="min-w-0"><dt className="text-sm normal-case tracking-normal text-[var(--stone)]">Entries</dt><dd className="mt-2 text-[14px]">{visa.entries}</dd></div>
+                  <div className="min-w-0"><dt className="text-sm normal-case tracking-normal text-[var(--stone)]">Fee from</dt><dd className="mt-2 text-[14px] tabular-nums">${visa.feeUsd} USD</dd></div>
+                  <div className="min-w-0"><dt className="text-sm normal-case tracking-normal text-[var(--stone)]">Timing</dt><dd className="mt-2 text-[14px]">{visa.processing}</dd></div>
                 </dl>
                 <p className="mt-5 text-[13px] text-[var(--stone)]"><span className="font-medium text-[var(--ink)]">Common uses:</span> {visa.commonUses}</p>
                 <Link className="focus-ring mt-6 inline-flex items-center gap-2 rounded-lg text-[14px] font-medium underline decoration-[var(--cobblestone)] decoration-1 underline-offset-4 hover:text-[var(--graphite)]" to={`/visa-types/${visa.slug}`}>Learn more <ArrowRight aria-hidden="true" size={15} strokeWidth={1.5} /></Link>

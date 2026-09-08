@@ -32,10 +32,10 @@ export async function listEntryPointRows(db: Database): Promise<EntryPointRow[]>
   return result.results ?? []
 }
 
-export async function getSectionRows(db: Database, applicationId: number): Promise<Record<string, SectionData>> {
+export async function getSectionRows(db: Database, applicationId: number, sectionsJson?: string): Promise<Record<string, SectionData>> {
   const [result, application] = await Promise.all([
     db.prepare('SELECT section, data_json FROM application_sections WHERE application_id = ? ORDER BY section').bind(applicationId).all<{ section: string; data_json: string }>(),
-    db.prepare('SELECT sections_json FROM applications WHERE id = ? LIMIT 1').bind(applicationId).first<{ sections_json: string }>(),
+    sectionsJson === undefined ? db.prepare('SELECT sections_json FROM applications WHERE id = ? LIMIT 1').bind(applicationId).first<{ sections_json: string }>() : Promise.resolve({ sections_json: sectionsJson }),
   ])
   const sections: Record<string, SectionData> = safeJsonParse<Record<string, SectionData>>(application?.sections_json, {})
   for (const item of result.results ?? []) sections[item.section] = safeJsonParse<SectionData>(item.data_json, {})
@@ -98,6 +98,7 @@ export function parseDocuments(rows: DocumentRow[]): DocumentRecord[] {
     documentType: row.document_type,
     originalFilename: row.original_filename,
     mimeType: row.mime_type,
+    sizeBytes: row.size_bytes,
     status: row.status,
     ...(row.rejection_reason ? { rejectionReason: row.rejection_reason } : {}),
     uploadedAt: row.uploaded_at,
@@ -164,24 +165,20 @@ export type ApplicationBundle = {
   events: EventRow[]
   eta: EtaRow | null
   visaType: VisaTypeRow | null
-  applicant: ApplicantRow | null
-  passport: PassportRow | null
 }
 
 export async function getApplicationBundle(db: Database, key: string, includeDocumentHistory = false): Promise<ApplicationBundle> {
   const row = await requireApplicationRow(db, key)
-  const [sections, documents, payment, notifications, events, eta, visaType, applicant, passport] = await Promise.all([
-    getSectionRows(db, row.id),
+  const [sections, documents, payment, notifications, events, eta, visaType] = await Promise.all([
+    getSectionRows(db, row.id, row.sections_json),
     getDocuments(db, row.id, includeDocumentHistory),
     getPayment(db, row.id),
     getNotifications(db, row.id),
     getEvents(db, row.id),
     getEta(db, row.id),
     getVisaTypeRow(db, row.visa_type_id),
-    getApplicant(db, row.id),
-    getPassport(db, row.id),
   ])
-  return { row, sections, documents, payment, notifications, events, eta, visaType, applicant, passport }
+  return { row, sections, documents, payment, notifications, events, eta, visaType }
 }
 
 export function applicationFromBundle(bundle: ApplicationBundle): Application {
@@ -199,6 +196,7 @@ export function applicationFromBundle(bundle: ApplicationBundle): Application {
     applicantName: row.applicant_name ?? String(bundle.sections.personal?.givenNames ?? ''),
     dob: row.dob ?? String(bundle.sections.personal?.dob ?? ''),
     passportNumber: row.passport_number ?? String(bundle.sections.passport?.passportNumber ?? ''),
+    version: row.version,
     createdAt: row.created_at,
     updatedAt: row.updated_at,
     ...(row.submitted_at ? { submittedAt: row.submitted_at } : {}),

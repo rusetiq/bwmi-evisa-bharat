@@ -2,9 +2,19 @@ import { Hono } from 'hono'
 import { ok } from '../http'
 import type { AppEnv } from '../types'
 import { getDocument } from '../db/queries'
-import { parseUpload, replaceDocumentById, uploadDocument } from '../services/documents'
+import { getDocumentContent, parseUpload, replaceDocumentById, uploadDocument } from '../services/documents'
 
 export const documentRoutes = new Hono<AppEnv>()
+
+documentRoutes.get('/documents/:id/view', async (c) => {
+  const docId = Number(c.req.param('id'))
+  return getDocumentContent(c.env.DB, c.env.DOCUMENTS, docId)
+})
+
+documentRoutes.get('/documents/:id', async (c) => {
+  const docId = Number(c.req.param('id'))
+  return getDocumentContent(c.env.DB, c.env.DOCUMENTS, docId)
+})
 
 documentRoutes.post('/applications/:id/documents', async (c) => {
   const payload = await parseUpload(c.req.raw)

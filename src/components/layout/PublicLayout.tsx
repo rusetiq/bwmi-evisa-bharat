@@ -1,9 +1,9 @@
 import type { ReactNode } from 'react'
-import { Link, useLocation } from 'react-router-dom'
+import { Link, Outlet, useLocation } from 'react-router-dom'
 import { SiteFooter } from './SiteFooter'
 import { SiteHeader } from './SiteHeader'
 
-export function PublicLayout({ children }: { children: ReactNode }) {
+export function PublicLayout({ children = <Outlet /> }: { children?: ReactNode }) {
   const { pathname } = useLocation()
   // Applicant, payment and print pages provide their own main landmark.
   const hasOwnMain = pathname === '/apply' || pathname.startsWith('/apply/') || pathname === '/find-application' || pathname.startsWith('/payment/') || pathname.startsWith('/application/')
@@ -23,12 +23,12 @@ export function PageFrame({ children, className = '' }: { children: ReactNode; c
 export function PageIntro({ eyebrow, title, intro, children }: { eyebrow?: ReactNode; title: ReactNode; intro?: ReactNode; children?: ReactNode }) {
   return (
     <div className="flex flex-col gap-8 border-b border-[var(--hairline)] pb-10 md:flex-row md:items-end md:justify-between md:gap-12 md:pb-12">
-      <div className="max-w-3xl">
-        {eyebrow && <p className="eyebrow mb-4 text-[var(--stone)]">{eyebrow}</p>}
+      <div className="min-w-0 max-w-3xl">
+
         <h1 className="display text-balance text-[clamp(2.8rem,6vw,4.65rem)] leading-[.98] text-[var(--ink)]">{title}</h1>
         {intro && <p className="mt-5 max-w-2xl text-[17px] leading-7 text-[var(--stone)] text-pretty">{intro}</p>}
       </div>
-      {children && <div className="shrink-0">{children}</div>}
+      {children && <div className="max-w-full shrink-0">{children}</div>}
     </div>
   )
 }

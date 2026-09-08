@@ -5,7 +5,7 @@ export type FieldOption = { value: string; label: string }
 export function SectionHeading({ eyebrow, title, description }: { eyebrow?: string; title: string; description?: string }) {
   return (
     <div className="mb-8 max-w-2xl">
-      {eyebrow && <p className="eyebrow mb-3 text-stone">{eyebrow}</p>}
+
       <h1 className="display text-4xl leading-tight sm:text-5xl">{title}</h1>
       {description && <p className="mt-4 max-w-xl text-base leading-7 text-stone">{description}</p>}
     </div>
@@ -31,7 +31,7 @@ export function FieldLabel({ id, label, hint, required }: Omit<BaseFieldProps, '
       <label className="label" htmlFor={id}>
         {label}{required && <span aria-hidden="true"> *</span>}
       </label>
-      {hint && <p className="mb-2 text-xs leading-5 text-stone">{hint}</p>}
+      {hint && <p id={`${id}-hint`} className="mb-2 text-xs leading-5 text-stone">{hint}</p>}
     </>
   )
 }
@@ -53,12 +53,13 @@ export function TextField({ id, label, value, onChange, type = 'text', placehold
         value={value}
         onChange={(event) => onChange(event.target.value)}
         placeholder={placeholder}
-        autoComplete={autoComplete}
+        autoComplete={autoComplete ?? fieldAutocomplete(id, type)}
+        inputMode={type === 'tel' ? 'tel' : type === 'email' ? 'email' : type === 'number' ? 'decimal' : 'text'}
+        autoCapitalize={type === 'email' ? 'none' : undefined}
         required={required}
         aria-invalid={Boolean(error)}
-        aria-describedby={error ? `${id}-error` : hint ? `${id}-hint` : undefined}
+        aria-describedby={[hint && `${id}-hint`, error && `${id}-error`].filter(Boolean).join(' ') || undefined}
       />
-      {hint && <span id={`${id}-hint`} className="sr-only">{hint}</span>}
       <span id={`${id}-error`}><FieldError message={error} /></span>
     </div>
   )
@@ -80,7 +81,7 @@ export function SelectField({ id, label, value, onChange, options, placeholder =
         onChange={(event) => onChange(event.target.value)}
         required={required}
         aria-invalid={Boolean(error)}
-        aria-describedby={error ? `${id}-error` : undefined}
+        aria-describedby={[hint && `${id}-hint`, error && `${id}-error`].filter(Boolean).join(" ") || undefined}
       >
         <option value="">{placeholder}</option>
         {options.map((option) => <option key={option.value} value={option.value}>{option.label}</option>)}
@@ -108,7 +109,7 @@ export function TextareaField({ id, label, value, onChange, placeholder, hint, e
         placeholder={placeholder}
         required={required}
         aria-invalid={Boolean(error)}
-        aria-describedby={error ? `${id}-error` : undefined}
+        aria-describedby={[hint && `${id}-hint`, error && `${id}-error`].filter(Boolean).join(" ") || undefined}
       />
       <span id={`${id}-error`}><FieldError message={error} /></span>
     </div>
@@ -122,28 +123,29 @@ export function CheckboxField({ id, label, checked, onChange, hint, error, class
   return (
     <div className={className}>
       <label className="flex cursor-pointer items-start gap-3 text-sm leading-6" htmlFor={id}>
-        <input id={id} className="mt-1 h-4 w-4 accent-[var(--ink)]" type="checkbox" checked={checked} onChange={(event) => onChange(event.target.checked)} aria-invalid={Boolean(error)} />
+        <input id={id} className="mt-1 h-4 w-4 accent-[var(--ink)]" type="checkbox" checked={checked} onChange={(event) => onChange(event.target.checked)} aria-invalid={Boolean(error)} aria-describedby={[hint && `${id}-hint`, error && `${id}-error`].filter(Boolean).join(" ") || undefined} />
         <span>{label}</span>
       </label>
-      {hint && <p className="mt-2 text-xs leading-5 text-stone">{hint}</p>}
-      <FieldError message={error} />
+      {hint && <p id={`${id}-hint`} className="mt-2 text-xs leading-5 text-stone">{hint}</p>}
+      <span id={`${id}-error`}><FieldError message={error} /></span>
     </div>
   )
 }
 
-export function RadioField({ id, label, value, selected, onChange, hint, error, className = '' }: Omit<BaseFieldProps, 'required'> & {
+export function RadioField({ id, name, label, value, selected, onChange, hint, error, className = '' }: Omit<BaseFieldProps, 'required'> & {
+  name: string
   value: string
   selected: boolean
   onChange: (value: string) => void
 }) {
   return (
     <div className={className}>
-      <label className={`flex min-h-12 cursor-pointer items-center gap-3 border px-4 py-3 text-sm ${selected ? 'border-[var(--ink)] bg-[var(--linen)]' : 'border-[var(--hairline)] bg-white'}`} htmlFor={id}>
-        <input id={id} className="h-4 w-4 accent-[var(--ink)]" type="radio" checked={selected} onChange={() => onChange(value)} />
-        <span>{label}</span>
+      <label className={`flex min-h-12 min-w-0 cursor-pointer items-center gap-3 border px-4 py-3 text-sm ${selected ? 'border-[var(--ink)] bg-[var(--linen)]' : 'border-[var(--hairline)] bg-white'}`} htmlFor={id}>
+        <input id={id} name={name} value={value} className="h-4 w-4 accent-[var(--ink)]" type="radio" checked={selected} onChange={() => onChange(value)} />
+        <span className="min-w-0 break-words">{label}</span>
       </label>
-      {hint && <p className="mt-2 text-xs leading-5 text-stone">{hint}</p>}
-      <FieldError message={error} />
+      {hint && <p id={`${id}-hint`} className="mt-2 text-xs leading-5 text-stone">{hint}</p>}
+      <span id={`${id}-error`}><FieldError message={error} /></span>
     </div>
   )
 }
@@ -156,19 +158,19 @@ export function ChoiceGroup({ id, label, value, options, onChange, hint, error, 
   return (
     <fieldset className={className}>
       <legend className="label">{label}{required && <span aria-hidden="true"> *</span>}</legend>
-      {hint && <p className="mb-3 text-xs leading-5 text-stone">{hint}</p>}
-      <div className="grid gap-2 sm:grid-cols-2" role="radiogroup" aria-labelledby={`${id}-legend`}>
+      {hint && <p id={`${id}-hint`} className="mb-3 text-xs leading-5 text-stone">{hint}</p>}
+      <div className="grid gap-2 sm:grid-cols-2" role="radiogroup" tabIndex={error ? -1 : undefined} aria-invalid={Boolean(error)} aria-required={required} aria-describedby={error ? `${id}-error` : hint ? `${id}-hint` : undefined} aria-labelledby={`${id}-legend`}>
         <span className="sr-only" id={`${id}-legend`}>{label}</span>
-        {options.map((option) => <RadioField key={option.value} id={`${id}-${option.value}`} label={option.label} value={option.value} selected={value === option.value} onChange={onChange} />)}
+        {options.map((option) => <RadioField key={option.value} id={`${id}-${option.value}`} name={id} label={option.label} value={option.value} selected={value === option.value} onChange={onChange} />)}
       </div>
-      <FieldError message={error} />
+      <span id={`${id}-error`}><FieldError message={error} /></span>
     </fieldset>
   )
 }
 
 export function Notice({ title, children, tone = 'neutral' }: { title?: string; children: ReactNode; tone?: 'neutral' | 'action' | 'success' | 'danger' }) {
   const toneClass = tone === 'action' ? 'border-[#d36a1b] bg-[#fff8f2]' : tone === 'success' ? 'border-[#7a9b82] bg-[#f2f7f3]' : tone === 'danger' ? 'border-[#b98b87] bg-[#faf3f2]' : 'border-[var(--hairline)] bg-[var(--linen)]'
-  return <div className={`border p-4 text-sm leading-6 ${toneClass}`} role={tone === 'danger' ? 'alert' : undefined}>{title && <p className="mb-1 font-medium">{title}</p>}<div className="text-stone">{children}</div></div>
+  return <div className={`border p-4 text-sm leading-6 ${toneClass}`} role={tone === 'danger' ? 'alert' : tone === 'success' ? 'status' : undefined} aria-live={tone === 'success' ? 'polite' : undefined} aria-atomic={tone === 'success' ? true : undefined}>{title && <p className="mb-1 font-medium">{title}</p>}<div className="text-stone">{children}</div></div>
 }
 
 export function FormActions({ backLabel = 'Back', continueLabel = 'Continue', onBack, onContinue, continueDisabled, busy }: { backLabel?: string; continueLabel?: string; onBack?: () => void; onContinue?: () => void; continueDisabled?: boolean; busy?: boolean }) {
@@ -192,4 +194,13 @@ export function asInputValue(value: unknown) {
 
 export function eventValue(event: ChangeEvent<HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement>) {
   return event.target.value
+}
+
+function fieldAutocomplete(id: string, type: string) {
+  if (/passport|nationalId/i.test(id)) return 'off'
+  if (type === 'email') return 'email'
+  if (/mobile/.test(id)) return 'tel'
+  const key = id.replace(/^field-/, '')
+  const tokens: Record<string, string> = { address1: 'address-line1', address2: 'address-line2', city: 'address-level2', state: 'address-level1', postalCode: 'postal-code', dob: 'bday', permanentAddress1: 'section-permanent address-line1', permanentAddress2: 'section-permanent address-line2', permanentCity: 'section-permanent address-level2', permanentState: 'section-permanent address-level1', permanentPostalCode: 'section-permanent postal-code' }
+  return tokens[key]
 }

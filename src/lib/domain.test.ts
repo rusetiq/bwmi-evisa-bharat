@@ -2,6 +2,7 @@ import { describe, expect, it } from 'vitest'
 import {
   applicationSteps,
   calculateVisaFee,
+  calculateApplicationFee,
   canTransition,
   getApplicationPrimaryAction,
   getApplicationProgress,
@@ -41,6 +42,7 @@ const completeSections: Record<string, SectionData> = {
     expiryDate: '2031-01-01',
   },
   contact: {
+    sameAddress: true,
     address1: '1 Main Street',
     city: 'Boston',
     state: 'Massachusetts',
@@ -65,6 +67,9 @@ const completeSections: Record<string, SectionData> = {
     industry: 'Technology',
   },
   travel: {
+    previousVisit: 'no',
+    tourLocations: 'Delhi',
+    tourActivity: 'Sightseeing',
     expectedArrival: '2026-10-01',
     expectedDeparture: '2026-10-15',
     arrivalPort: 'Delhi International Airport',
@@ -119,6 +124,13 @@ describe('required document rules', () => {
 })
 
 describe('visa fee calculation', () => {
+  it('uses the saved tourist subtype for checkout and preserves legacy standard fees', () => {
+    const app = { nationality: 'United States', visaType: 'e-tourist', sections: completeSections }
+    expect(calculateApplicationFee(app).total).toBe(28)
+    expect(calculateApplicationFee({ ...app, sections: { visa: { visaSubtype: 'e-tourist-1-year' } } }).total).toBe(43)
+    expect(calculateApplicationFee({ ...app, sections: { visa: { visaSubtype: 'e-tourist' } } }).total).toBe(43)
+    expect(calculateApplicationFee({ ...app, nationality: 'Japan' }).total).toBe(18)
+  })
   it('calculates standard and short tourist fees', () => {
     expect(calculateVisaFee('United States', 'e-tourist')).toEqual({ visaFee: 40, transactionCharge: 3, total: 43, currency: 'USD' })
     expect(calculateVisaFee('United States', 'e-tourist', '30-days')).toEqual({ visaFee: 25, transactionCharge: 3, total: 28, currency: 'USD' })

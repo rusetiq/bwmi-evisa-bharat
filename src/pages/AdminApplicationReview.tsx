@@ -1,5 +1,5 @@
 import { useEffect, useMemo, useState } from 'react'
-import { ArrowLeft, ExternalLink, RefreshCw } from 'lucide-react'
+import { ArrowLeft, Download, ExternalLink, FileText, Image as ImageIcon, RefreshCw } from 'lucide-react'
 import { Link, useParams } from 'react-router-dom'
 import { api, ApiError } from '../lib/api'
 import type { Application, DocumentRecord } from '../lib/types'
@@ -74,7 +74,7 @@ function ReviewContent({ application, notice, onUpdated, onRefresh }: { applicat
     <>
       <div className="mb-8 flex flex-wrap items-center justify-between gap-4">
         <Link className="focus-ring inline-flex items-center gap-2 rounded-lg text-sm text-[var(--graphite)] underline decoration-[var(--cobblestone)] underline-offset-4" to="/admin/applications"><ArrowLeft size={15} aria-hidden="true" />Back to applications</Link>
-        <div className="flex flex-wrap items-center gap-3"><Button variant="secondary" leadingIcon={<RefreshCw size={15} aria-hidden="true" />} onClick={onRefresh}>Refresh record</Button><ButtonLink to={`/application/${application.publicId}`} variant="secondary" trailingIcon={<ExternalLink size={15} aria-hidden="true" />}>Applicant view</ButtonLink></div>
+        <div className="flex w-full flex-wrap items-center gap-3 sm:w-auto"><Button className="w-full sm:w-auto" variant="secondary" leadingIcon={<RefreshCw size={15} aria-hidden="true" />} onClick={onRefresh}>Refresh record</Button><ButtonLink className="w-full sm:w-auto" to={`/application/${application.publicId}`} variant="secondary" trailingIcon={<ExternalLink size={15} aria-hidden="true" />}>Applicant view</ButtonLink></div>
       </div>
 
       <AdminPageHeader
@@ -86,10 +86,12 @@ function ReviewContent({ application, notice, onUpdated, onRefresh }: { applicat
 
       {notice && <div className="mt-6"><Notice title="Review update saved" tone="success">{notice}</Notice></div>}
 
+      <div className="mt-6"><Notice title="Fictional review record">This officer workspace is simulated. Decisions and document requests update the sample applicant view for demonstration purposes.</Notice></div>
+
       <div className="mt-8"><AdminActionPanel application={application} onUpdated={onUpdated} /></div>
 
       <div className="mt-12 grid gap-x-10 gap-y-12 lg:grid-cols-2">
-        <AdminSection title="Applicant" eyebrow="Identity and contact">
+        <AdminSection title="Applicant">
           <SummaryList rows={[
             { label: 'Full name', value: valueOrDash(application.applicantName || [sectionValue(application, 'personal', 'givenNames'), sectionValue(application, 'personal', 'surname')].filter(Boolean).join(' ')) },
             { label: 'Date of birth', value: valueOrDash(application.dob || sectionValue(application, 'personal', 'dob')) },
@@ -101,7 +103,7 @@ function ReviewContent({ application, notice, onUpdated, onRefresh }: { applicat
           ]} />
         </AdminSection>
 
-        <AdminSection title="Passport" eyebrow="Travel document">
+        <AdminSection title="Passport">
           <SummaryList rows={[
             { label: 'Passport number', value: valueOrDash(application.passportNumber || sectionValue(application, 'passport', 'passportNumber')) },
             { label: 'Passport type', value: valueOrDash(sectionValue(application, 'passport', 'passportType')) },
@@ -112,7 +114,7 @@ function ReviewContent({ application, notice, onUpdated, onRefresh }: { applicat
           ]} />
         </AdminSection>
 
-        <AdminSection title="Visa and travel" eyebrow="Journey details">
+        <AdminSection title="Visa and travel">
           <SummaryList rows={[
             { label: 'Visa type', value: valueOrDash(application.visaTypeName || application.visaType) },
             { label: 'Nationality', value: valueOrDash(application.nationality || sectionValue(application, 'visa', 'nationality')) },
@@ -125,7 +127,7 @@ function ReviewContent({ application, notice, onUpdated, onRefresh }: { applicat
           ]} />
         </AdminSection>
 
-        <AdminSection title="Background" eyebrow="Declarations">
+        <AdminSection title="Background">
           {hasBackgroundConcern && <Notice title="Review attention" tone="action">At least one background declaration is marked Yes. Confirm the supporting context before recording a decision.</Notice>}
           <SummaryList rows={backgroundFlags.map(([label, key]) => ({ label, value: valueOrDash(String(background[key] ?? '')) }))} />
           <div className="mt-2"><SummaryList rows={[{ label: 'Declaration confirmed', value: background.declaration === true || String(background.declaration).toLowerCase() === 'yes' ? 'Yes' : 'No' }]} /></div>
@@ -135,7 +137,7 @@ function ReviewContent({ application, notice, onUpdated, onRefresh }: { applicat
           <AdminDocumentList documents={application.documents ?? []} applicationId={application.publicId} />
         </AdminSection>
 
-        <AdminSection title="Payment" eyebrow="Transaction record">
+        <AdminSection title="Payment">
           {application.payment ? <SummaryList rows={[
             { label: 'Status', value: <AdminPaymentStatus status={application.payment.status} /> },
             { label: 'Amount', value: `${application.payment.currency} ${application.payment.amount}` },
@@ -146,7 +148,7 @@ function ReviewContent({ application, notice, onUpdated, onRefresh }: { applicat
           {application.payment && <Link className="focus-ring mt-4 inline-flex rounded-lg text-sm text-[var(--graphite)] underline decoration-[var(--cobblestone)] underline-offset-4" to={`/payment/${application.publicId}`}>Open applicant payment view</Link>}
         </AdminSection>
 
-        <AdminSection title="Activity" eyebrow="Audit history">
+        <AdminSection title="Activity">
           {application.events?.length ? <EventList events={application.events} /> : <p className="text-sm leading-6 text-stone">No activity has been recorded for this application yet.</p>}
         </AdminSection>
       </div>
@@ -157,20 +159,75 @@ function ReviewContent({ application, notice, onUpdated, onRefresh }: { applicat
 }
 
 function AdminDocumentList({ documents, applicationId }: { documents: DocumentRecord[]; applicationId: string }) {
-  if (!documents.length) return <EmptyState title="No documents uploaded" action={<Link className="btn btn-secondary focus-ring" to={`/application/${applicationId}`}>Open applicant workspace</Link>}>There are no files for the reviewing officer to assess yet.</EmptyState>
+  if (!documents.length) {
+    return (
+      <EmptyState title="No documents uploaded" action={<Link className="btn btn-secondary focus-ring" to={`/application/${applicationId}`}>Open applicant workspace</Link>}>
+        There are no files for the reviewing officer to assess yet.
+      </EmptyState>
+    )
+  }
+
   return (
     <div className="grid gap-3">
       {documents.map((document) => {
         const requested = document.status === 'REUPLOAD_REQUIRED'
         const statusClass = requested ? 'status status-action' : document.status === 'ACCEPTED' || document.status === 'REPLACED' ? 'status status-success' : 'status'
-        return <article key={document.id} className={`border bg-[var(--paper)] p-4 sm:p-5 ${requested ? 'border-[#d9691a]' : 'border-[var(--hairline)]'}`}>
-          <div className="flex flex-col gap-4 sm:flex-row sm:items-start sm:justify-between">
-            <div className="min-w-0"><h3 className="text-base font-medium">{documentLabel(document.documentType)}</h3><p className="mt-1 truncate text-sm text-stone">{document.originalFilename || 'Filename not recorded'} · {document.mimeType || 'Unknown format'}</p></div>
-            <span className={statusClass}>{formatDocumentStatus(document.status)}</span>
-          </div>
-          <dl className="mt-4 grid gap-3 border-t border-[var(--hairline)] pt-3 text-sm sm:grid-cols-3"><div><dt className="text-xs text-stone">Version</dt><dd className="mt-1 font-mono tabular-nums">{document.version}</dd></div><div><dt className="text-xs text-stone">Uploaded</dt><dd className="mt-1">{formatDateTime(document.uploadedAt)}</dd></div><div><dt className="text-xs text-stone">Reviewed</dt><dd className="mt-1">{formatDateTime(document.reviewedAt)}</dd></div></dl>
-          {document.rejectionReason && <p className="mt-4 border-t border-[var(--hairline)] pt-3 text-sm leading-6 text-[#8c2525]">{document.rejectionReason}</p>}
-        </article>
+        const isPhoto = document.documentType === 'photograph' || (document.mimeType && document.mimeType.startsWith('image/'))
+        const docUrl = `/api/documents/${document.id}/view`
+
+        return (
+          <article key={document.id} className={`border bg-[var(--paper)] p-4 sm:p-5 ${requested ? 'border-[#d9691a]' : 'border-[var(--hairline)]'}`}>
+            <div className="flex flex-col gap-4 sm:flex-row sm:items-start sm:justify-between">
+              <div className="flex items-start gap-3 min-w-0">
+                <div className="mt-0.5 flex size-9 shrink-0 items-center justify-center rounded-lg border border-[var(--hairline)] bg-[var(--linen)] text-[var(--graphite)]">
+                  {isPhoto ? <ImageIcon size={18} aria-hidden="true" /> : <FileText size={18} aria-hidden="true" />}
+                </div>
+                <div className="min-w-0">
+                  <h3 className="text-base font-medium">{documentLabel(document.documentType)}</h3>
+                  <p className="mt-1 truncate text-sm text-stone">
+                    {document.originalFilename || 'Filename not recorded'} · {document.mimeType || 'Unknown format'} {document.sizeBytes ? `· ${Math.round(document.sizeBytes / 1024)} KB` : ''}
+                  </p>
+                </div>
+              </div>
+              <div className="flex flex-wrap items-center gap-2 sm:shrink-0">
+                <span className={statusClass}>{formatDocumentStatus(document.status)}</span>
+              </div>
+            </div>
+
+            <dl className="mt-4 grid gap-3 border-t border-[var(--hairline)] pt-3 text-sm sm:grid-cols-3">
+              <div><dt className="text-xs text-stone">Version</dt><dd className="mt-1 font-mono tabular-nums">{document.version}</dd></div>
+              <div><dt className="text-xs text-stone">Uploaded</dt><dd className="mt-1">{formatDateTime(document.uploadedAt)}</dd></div>
+              <div><dt className="text-xs text-stone">Reviewed</dt><dd className="mt-1">{formatDateTime(document.reviewedAt)}</dd></div>
+            </dl>
+
+            {document.rejectionReason && (
+              <p className="mt-4 border-t border-[var(--hairline)] pt-3 text-sm leading-6 text-[#8c2525]">
+                {document.rejectionReason}
+              </p>
+            )}
+
+            <div className="mt-4 flex flex-wrap items-center gap-3 border-t border-[var(--hairline)] pt-4">
+              <a
+                href={docUrl}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="btn btn-primary min-h-9 w-full gap-2 px-4 text-[13px] sm:w-auto"
+              >
+                <ExternalLink size={14} aria-hidden="true" />
+                View document
+              </a>
+
+              <a
+                href={docUrl}
+                download={document.originalFilename || 'document'}
+                className="btn btn-secondary min-h-9 w-full gap-2 px-4 text-[13px] sm:w-auto"
+              >
+                <Download size={14} aria-hidden="true" />
+                Download
+              </a>
+            </div>
+          </article>
+        )
       })}
     </div>
   )

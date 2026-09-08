@@ -1,23 +1,23 @@
-# Indian e-Visa — independent redesign prototype
+# indian e-visa
 
-A complete proof of concept for a calmer, application-centred Indian e-Visa experience. It combines a React interface and Hono API in one Cloudflare Workers project, with persistent D1 records and R2-backed demonstration uploads.
+yeah so this is an independent redesign prototype for an indian e-visa flow. its a react app + hono api in one cloudflare workers project, and it has d1 for the fake app data plus r2 for the fake uploads.
 
-> Independent redesign prototype. Not an official Government of India service. All people, documents, decisions, fees, entry points and support details are fictional demonstration data. No real government, immigration, passport, payment or email APIs are used.
+> important: this isnt an official government of india service. literally all of it is demo stuff — people, docs, decisions, fees, entry points, support details, all fake. it doesnt connect to real passport, immigration, payment, or email apis either.
 
-## Stack
+## whats in here
 
-- TypeScript, React, Vite and React Router
-- Tailwind CSS with a small editorial design system
-- Cloudflare Workers and Hono
-- Cloudflare D1 for application data
-- Cloudflare R2 for demonstration uploads
-- Zod validation and Vitest business-logic tests
+- typescript, react, vite, react router
+- tailwind with a small editorial design system
+- cloudflare workers + hono
+- d1 for application data
+- r2 for demo uploads
+- zod + vitest for validation and business logic tests
 
-The frontend static assets and Worker API deploy together. All server endpoints live below `/api`; the Worker accesses D1 and R2 through native bindings. The project requires no `DATABASE_URL`, traditional database server or third-party backend.
+the frontend and api deploy together. api stuff lives under `/api` and the worker uses cloudflare bindings for d1 and r2, so nah theres no `DATABASE_URL`, normal database server, or random third-party backend to set up.
 
-## Local setup
+## run it locally
 
-Requirements: Node.js 20 or newer and a free Cloudflare account.
+youll need node 20+ and a free cloudflare account.
 
 ```bash
 npm install
@@ -26,9 +26,9 @@ npx wrangler d1 create india-evisa --location apac
 npx wrangler r2 bucket create india-evisa-documents
 ```
 
-Copy the `database_id` returned by the D1 create command into `wrangler.jsonc`, replacing `REPLACE_WITH_YOUR_D1_DATABASE_ID`. The `DB` and `DOCUMENTS` binding names must remain unchanged.
+when wrangler gives u the d1 `database_id`, put it in `wrangler.jsonc` where it says `REPLACE_WITH_YOUR_D1_DATABASE_ID`. leave the `DB` and `DOCUMENTS` binding names alone tho.
 
-Prepare and seed the local database:
+then set up the local data and start it:
 
 ```bash
 npm run db:migrate
@@ -36,11 +36,11 @@ npm run db:seed
 npm run dev
 ```
 
-Wrangler provides local D1 and R2 persistence. Refreshing or restarting the browser does not discard saved application state.
+wrangler keeps local d1 and r2 data around, so refreshing or restarting the browser doesnt just delete ur application state.
 
-## Deploy to Cloudflare
+## deploy it
 
-Apply the schema and fictional seed records to the remote D1 database, then deploy the Worker and static assets:
+first put the schema + fictional seed data in remote d1, then deploy everything:
 
 ```bash
 npm run db:migrate:remote
@@ -48,39 +48,39 @@ npm run db:seed:remote
 npm run deploy
 ```
 
-The generated `workers.dev` URL is sufficient; no custom domain or paid service is required. The APAC location hint is selected when the database is created. This prototype is designed to remain comfortably within Cloudflare's Free-plan limits by using compact autosave patches, purpose-built dashboard queries, indexes and D1 batch writes.
+the generated `workers.dev` url is enough, no custom domain or paid service needed. the d1 setup uses the apac location hint. this is also meant to stay comfortably in cloudflare's free plan with small autosave patches, targeted dashboard queries, indexes, and d1 batch writes.
 
-## Demo records
+## demo records
 
-Use the application ID, passport number and date of birth together on **Find application** or **Payment verification**.
+use the application id, passport number, and date of birth together in **find application** or **payment verification**.
 
-| Applicant | Application ID | Passport | Date of birth | State |
+| applicant | application id | passport | date of birth | state |
 |---|---|---|---|---|
-| Maya Thompson | `IND-EV-26-DEMO01` | `P1234567` | `1996-08-14` | Draft |
-| Daniel Weber | `IND-EV-26-DEMO02` | `C01X8831` | `1988-02-19` | Payment pending |
-| Sophie Martin | `IND-EV-26-DEMO03` | `22FV61948` | `1992-11-03` | Under review |
-| Kenji Sato | `IND-EV-26-DEMO04` | `TR4901812` | `1985-05-22` | Document replacement |
-| Amelia Wilson | `IND-EV-26-DEMO05` | `N8406713` | `1990-07-10` | Granted with ETA |
-| Omar Al Mansoori | `IND-EV-26-DEMO06` | `A7843021` | `1983-12-04` | Decision made |
+| Maya Thompson | `IND-EV-26-DEMO01` | `P1234567` | `1996-08-14` | draft |
+| Daniel Weber | `IND-EV-26-DEMO02` | `C01X8831` | `1988-02-19` | payment pending |
+| Sophie Martin | `IND-EV-26-DEMO03` | `22FV61948` | `1992-11-03` | under review |
+| Kenji Sato | `IND-EV-26-DEMO04` | `TR4901812` | `1985-05-22` | document replacement |
+| Amelia Wilson | `IND-EV-26-DEMO05` | `N8406713` | `1990-07-10` | granted with eta |
+| Omar Al Mansoori | `IND-EV-26-DEMO06` | `A7843021` | `1983-12-04` | decision made |
 
-The `/demo` page contains the same fictional references. The admin portal at `/admin` uses the visible mock identity `Visa Review Officer — demo-admin@gov.example`; its server mutation boundary is intentionally simple and suitable only for this demonstration.
+the `/demo` page has the same fake references. `/admin` uses the visible mock identity `Visa Review Officer — demo-admin@gov.example`. the admin mutation boundary is intentionally simple cuz this is just a demo, not something to use for real access control.
 
-## Architecture
+## how its set up
 
 ```text
-Browser
-  ├─ React Router application workspace
+browser
+  ├─ react router application workspace
   └─ /api requests
         ↓
-Cloudflare Worker / Hono
-  ├─ D1: applications, sections, documents, payments, events,
-  │      notifications, ETAs and reference data
-  └─ R2: fictional upload objects under server-generated keys
+cloudflare worker / hono
+  ├─ d1: applications, sections, documents, payments, events,
+  │      notifications, etas, and reference data
+  └─ r2: fictional upload objects under server-generated keys
 ```
 
-Application form sections are stored independently, so the 600 ms autosave sends only the current changed section. Server validation, prepared statements and indexed lookup fields protect every persistence path. Multi-record status changes such as document replacement requests and grants use D1 batches.
+form sections save separately, so the 600 ms autosave only sends the part that changed. the server does validation, prepared statements, and indexed lookups on every persistence path. stuff that changes multiple records at once, like replacement requests or grants, uses d1 batches.
 
-## Useful commands
+## useful commands
 
 ```bash
 npm run typecheck
@@ -90,4 +90,4 @@ npm run db:migrate
 npm run db:seed
 ```
 
-Only fictional files should be uploaded. The application accepts PDF, JPG and PNG demonstration documents up to 10 MB, passes them through the Worker, generates the R2 key server-side and stores only metadata in D1.
+only upload fictional files pls. it accepts pdf, jpg, and png demo docs up to 10 mb, sends them through the worker, makes the r2 key server-side, and only keeps metadata in d1.

@@ -33,7 +33,7 @@ export function Help() {
 
   return (
     <PageFrame>
-      <PageIntro eyebrow="Answers, in plain language" title="How can we help?" intro="Search the common questions below or browse by topic. This support centre describes the demonstration service, not official visa policy." />
+      <PageIntro title="How can we help?" intro="Search the common questions below or browse by topic. This support centre describes the demonstration service, not official visa policy." />
 
       <section aria-labelledby="help-search-heading" className="mt-10">
         <h2 className="sr-only" id="help-search-heading">Search help topics</h2>
@@ -44,7 +44,7 @@ export function Help() {
       </section>
 
       <section aria-labelledby="more-help-heading" className="mt-16 grid gap-8 border-t border-[var(--hairline)] pt-10 md:grid-cols-[1fr_auto] md:items-center">
-        <div><p className="eyebrow text-[var(--stone)]">Still need more help?</p><h2 className="display mt-3 text-3xl" id="more-help-heading">Bring your application reference.</h2><p className="mt-3 max-w-xl text-[15px] leading-6 text-[var(--stone)]">For this prototype, use the demo records or find an application to see the relevant next step.</p></div>
+        <div><h2 className="display mt-3 text-3xl" id="more-help-heading">Bring your application reference.</h2><p className="mt-3 max-w-xl text-[15px] leading-6 text-[var(--stone)]">For this prototype, use the demo records or find an application to see the relevant next step.</p></div>
         <div className="flex flex-col items-start gap-4 sm:flex-row sm:items-center"><Link className="focus-ring inline-flex items-center gap-2 rounded-lg text-[14px] font-medium underline decoration-[var(--cobblestone)] decoration-1 underline-offset-4 hover:text-[var(--graphite)]" to="/find-application">Find an application <ArrowRight aria-hidden="true" size={15} strokeWidth={1.5} /></Link><a className="focus-ring inline-flex items-center gap-2 rounded-lg text-[14px] text-[var(--stone)] underline underline-offset-4 hover:text-[var(--ink)]" href="mailto:demo-support@gov.example"><Mail aria-hidden="true" size={15} strokeWidth={1.5} />demo-support@gov.example</a></div>
       </section>
       <Notice className="mt-10" title="Prototype support">The support address above is fictional and does not send a real service request.</Notice>

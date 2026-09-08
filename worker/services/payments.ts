@@ -1,5 +1,5 @@
 import type { Application } from '@/lib/types'
-import { calculateVisaFee } from '@/lib/domain'
+import { calculateApplicationFee } from '@/lib/domain'
 import { HttpError, now } from '../http'
 import { applicationFromBundle, createEventStatement, createNotificationStatement, getApplicationBundle, getPayment, parsePayment, requireApplicationRow } from '../db/queries'
 import type { AppEnv } from '../types'
@@ -30,7 +30,7 @@ export async function simulatePayment(db: Database, key: string, rawInput: unkno
   if (['GRANTED', 'REJECTED'].includes(app.status)) throw new HttpError(409, 'PAYMENT_CLOSED', 'This application is no longer accepting payments.')
   if (!['SUBMITTED', 'PAYMENT_PENDING', 'UNDER_REVIEW'].includes(app.status)) throw new HttpError(409, 'APPLICATION_NOT_SUBMITTED', 'Submit the application before starting payment.')
   const updatedAt = now()
-  const fee = calculateVisaFee(app.nationality, app.visa_type_id)
+  const fee = calculateApplicationFee({ nationality: app.nationality, visaType: app.visa_type_id, sections: bundle.sections })
   const reference = status === 'SUCCESS' ? transactionReference(app.public_id) : null
   const nextApplicationStatus = status === 'SUCCESS' ? 'UNDER_REVIEW' : app.status === 'UNDER_REVIEW' ? 'UNDER_REVIEW' : 'PAYMENT_PENDING'
   const title = status === 'SUCCESS' ? 'Payment received' : status === 'FAILED' ? 'Payment was not completed' : 'Payment is being verified'

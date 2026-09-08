@@ -15,17 +15,17 @@ function Checklist({ items }: { items: string[] }) {
 export function Requirements() {
   return (
     <PageFrame>
-      <PageIntro eyebrow="Prepare with confidence" title="The essentials before you begin." intro="A short checklist for the demonstration application. Keep your passport nearby and allow time to review every answer before submitting." />
+      <PageIntro title="The essentials before you begin." intro="A short checklist for the demonstration application. Keep your passport nearby and allow time to review every answer before submitting." />
 
       <div className="mt-12 grid gap-14 lg:grid-cols-[minmax(0,1fr)_280px] lg:gap-20">
         <div>
           <section aria-labelledby="before-start-heading">
-            <div className="flex items-start gap-4"><span className="flex size-10 shrink-0 items-center justify-center border border-[var(--hairline)] bg-[var(--paper)]"><FileText aria-hidden="true" className="text-[var(--orange)]" size={19} strokeWidth={1.35} /></span><div><p className="eyebrow text-[var(--stone)]">01</p><h2 className="display mt-2 text-3xl" id="before-start-heading">Before you start</h2></div></div>
+            <div className="flex items-start gap-4"><span className="flex size-10 shrink-0 items-center justify-center border border-[var(--hairline)] bg-[var(--paper)]"><FileText aria-hidden="true" className="text-[var(--orange)]" size={19} strokeWidth={1.35} /></span><div><h2 className="display mt-2 text-3xl" id="before-start-heading">Before you start</h2></div></div>
             <div className="mt-7 border-y border-[var(--hairline)] py-7"><Checklist items={beforeStart} /></div>
           </section>
 
           <section aria-labelledby="documents-heading" className="mt-14">
-            <div className="flex items-start gap-4"><span className="flex size-10 shrink-0 items-center justify-center border border-[var(--hairline)] bg-[var(--paper)]"><ScanLine aria-hidden="true" className="text-[var(--orange)]" size={19} strokeWidth={1.35} /></span><div><p className="eyebrow text-[var(--stone)]">02</p><h2 className="display mt-2 text-3xl" id="documents-heading">Documents</h2></div></div>
+            <div className="flex items-start gap-4"><span className="flex size-10 shrink-0 items-center justify-center border border-[var(--hairline)] bg-[var(--paper)]"><ScanLine aria-hidden="true" className="text-[var(--orange)]" size={19} strokeWidth={1.35} /></span><div><h2 className="display mt-2 text-3xl" id="documents-heading">Documents</h2></div></div>
             <div className="mt-7 border-y border-[var(--hairline)] py-7"><Checklist items={documents} /></div>
           </section>
 
@@ -45,14 +45,14 @@ export function Requirements() {
           </section>
 
           <section aria-labelledby="after-approval-heading" className="mt-14">
-            <div className="flex items-start gap-4"><span className="flex size-10 shrink-0 items-center justify-center border border-[var(--hairline)] bg-[var(--paper)]"><Mail aria-hidden="true" className="text-[var(--orange)]" size={19} strokeWidth={1.35} /></span><div><p className="eyebrow text-[var(--stone)]">03</p><h2 className="display mt-2 text-3xl" id="after-approval-heading">After approval</h2></div></div>
+            <div className="flex items-start gap-4"><span className="flex size-10 shrink-0 items-center justify-center border border-[var(--hairline)] bg-[var(--paper)]"><Mail aria-hidden="true" className="text-[var(--orange)]" size={19} strokeWidth={1.35} /></span><div><h2 className="display mt-2 text-3xl" id="after-approval-heading">After approval</h2></div></div>
             <div className="mt-7 border-y border-[var(--hairline)] py-7"><Checklist items={['Check your ETA details carefully', 'Carry the passport used for the application', 'Keep a copy of the ETA with your travel documents', 'Complete immigration formalities on arrival']} /></div>
           </section>
         </div>
 
         <aside className="lg:border-l lg:border-[var(--hairline)] lg:pl-8">
           <Notice title="Demonstration guidance">The requirements on this page are intentionally simplified and are not an official checklist. Use the prototype with fictional details only.</Notice>
-          <div className="mt-8 border-t border-[var(--hairline)] pt-6"><p className="eyebrow text-[var(--stone)]">Not sure where to start?</p><p className="mt-3 text-[15px] leading-6 text-[var(--stone)]">Compare categories or answer five questions about your journey.</p><div className="mt-5 grid gap-3"><ButtonLink className="w-full" to="/eligibility" variant="secondary" trailingIcon={<ArrowRight aria-hidden="true" size={16} strokeWidth={1.5} />}>Check eligibility</ButtonLink><Link className="focus-ring rounded-lg text-center text-[14px] underline underline-offset-4 hover:text-[var(--graphite)]" to="/visa-types">View visa types</Link></div></div>
+          <div className="mt-8 border-t border-[var(--hairline)] pt-6"><p className="mt-3 text-[15px] leading-6 text-[var(--stone)]">Compare categories or answer five questions about your journey.</p><div className="mt-5 grid gap-3"><ButtonLink className="w-full" to="/eligibility" variant="secondary" trailingIcon={<ArrowRight aria-hidden="true" size={16} strokeWidth={1.5} />}>Check eligibility</ButtonLink><Link className="focus-ring rounded-lg text-center text-[14px] underline underline-offset-4 hover:text-[var(--graphite)]" to="/visa-types">View visa types</Link></div></div>
         </aside>
       </div>
     </PageFrame>
